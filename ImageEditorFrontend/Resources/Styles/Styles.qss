@@ -1,0 +1,97 @@
+/* Button Styles */
+QPushButton {
+    background-color: #4b4b4b;  /* Grayish background */
+    border: 2px solid #5b5b5b;  /* Slightly darker border */
+    border-radius: 8px;
+    padding: 5px;
+    color: white;
+}
+
+/* Icon buttons */
+QPushButton#openButton,
+QPushButton#saveButton,
+QPushButton#cropButton,
+QPushButton#rotateRightButton,
+QPushButton#rotateLeftButton,
+QPushButton#flipButton {
+    width: 64px;
+    height: 64px;
+    qproperty-iconSize: 30px 30px;  /* Adjusted icon size */
+    background-color: #4b4b4b;  /* Grayish background for consistency */
+}
+
+QPushButton#cropButton {
+    qproperty-icon: url(:/MainWindow/Icons/crop.png);
+}
+
+QPushButton#rotateRightButton {
+    qproperty-icon: url(:/MainWindow/Icons/rotate-right.png);
+}
+
+QPushButton#rotateLeftButton {
+    qproperty-icon: url(:/MainWindow/Icons/rotate-left.png);
+}
+
+QPushButton#flipButton {
+    qproperty-icon: url(:/MainWindow/Icons/flip.png);
+}
+
+QPushButton#openButton {
+    qproperty-icon: url(:/MainWindow/Icons/folder.png);
+}
+
+QPushButton#saveButton {
+    qproperty-icon: url(:/MainWindow/Icons/save.png);
+}
+
+/* Filter buttons */
+QPushButton#filter1Button,
+QPushButton#filter2Button,
+QPushButton#filter3Button,
+QPushButton#filter4Button {
+    width: 64px;
+    height: 64px;
+    qproperty-iconSize: 47px 47px;  /* Smaller icon size */
+    background-color: #4b4b4b;  /* Grayish background for consistency */
+}
+
+QPushButton#filter1Button {
+    qproperty-icon: url(:/MainWindow/Icons/filterWoman.jpg);
+}
+
+QPushButton#filter2Button {
+    qproperty-icon: url(:/MainWindow/Icons/filterWoman.jpg);
+}
+
+QPushButton#filter3Button {
+    qproperty-icon: url(:/MainWindow/Icons/filterWoman.jpg);
+}
+
+QPushButton#filter4Button {
+    qproperty-icon: url(:/MainWindow/Icons/filterWoman.jpg);
+}
+
+/* RGB Buttons */
+QPushButton#redRGBButton {
+    background-color: rgb(200, 100, 100);  /* Softer red */
+    qproperty-icon: url(:/MainWindow/Icons/rgb.png);
+    qproperty-iconSize: 30px 30px;
+}
+
+QPushButton#blueRGBButton {
+    background-color: rgb(100, 100, 200);  /* Softer blue */
+    qproperty-icon: url(:/MainWindow/Icons/rgb.png);
+    qproperty-iconSize: 30px 30px;
+}
+
+QPushButton#greenRGBButton {
+    background-color: rgb(100, 200, 100);  /* Softer green */
+    qproperty-icon: url(:/MainWindow/Icons/rgb.png);
+    qproperty-iconSize: 30px 30px;
+}
+
+/* General label styles */
+QLabel#histogramViewer {
+    border: 1px solid #5b5b5b;  /* Adjusted to match button borders */
+    background-color: #4b4b4b;  /* Softer, grayish background for histogram */
+}

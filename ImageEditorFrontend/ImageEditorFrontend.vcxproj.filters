@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Models">
+      <UniqueIdentifier>{63102ebb-ac75-45cb-80d5-ebfeafb923f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Services">
+      <UniqueIdentifier>{76e823e6-472b-44ad-a500-6ec5c4715592}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controllers">
+      <UniqueIdentifier>{973cf90e-d699-43e4-9de1-2c9d6f239429}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Views">
+      <UniqueIdentifier>{4122e7d4-4642-4e48-b6bb-206a358ed9c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{fdc42f24-dd63-4649-a1dd-82061a5d28fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Icons">
+      <UniqueIdentifier>{cc1a2271-5427-478d-83ab-3ceafcbcac1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Styles">
+      <UniqueIdentifier>{0258791b-c57a-4e0d-a18a-5e43c9235554}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Controllers\MainWindowController.cpp">
+      <Filter>Controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="Models\Image.cpp">
+      <Filter>Models</Filter>
+    </ClCompile>
+    <ClCompile Include="Services\BaseService.cpp">
+      <Filter>Services</Filter>
+    </ClCompile>
+    <ClCompile Include="Services\ImageService.cpp">
+      <Filter>Services</Filter>
+    </ClCompile>
+    <ClCompile Include="Views\MainWindow.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="Controllers\MainWindowController.h">
+      <Filter>Controllers</Filter>
+    </QtMoc>
+    <QtMoc Include="Services\BaseService.h">
+      <Filter>Services</Filter>
+    </QtMoc>
+    <QtMoc Include="Services\ImageService.h">
+      <Filter>Services</Filter>
+    </QtMoc>
+    <QtMoc Include="Views\MainWindow.h">
+      <Filter>Views</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Models\Image.h">
+      <Filter>Models</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\Icons\crop.png">
+      <Filter>Resources\Icons</Filter>
+    </Image>
+    <Image Include="Resources\Icons\filterWoman.jpg">
+      <Filter>Resources\Icons</Filter>
+    </Image>
+    <Image Include="Resources\Icons\flip.png">
+      <Filter>Resources\Icons</Filter>
+    </Image>
+    <Image Include="Resources\Icons\folder.png">
+      <Filter>Resources\Icons</Filter>
+    </Image>
+    <Image Include="Resources\Icons\rgb.png">
+      <Filter>Resources\Icons</Filter>
+    </Image>
+    <Image Include="Resources\Icons\rotate-left.png">
+      <Filter>Resources\Icons</Filter>
+    </Image>
+    <Image Include="Resources\Icons\rotate-right.png">
+      <Filter>Resources\Icons</Filter>
+    </Image>
+    <Image Include="Resources\Icons\save.png">
+      <Filter>Resources\Icons</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Styles\Styles.qss">
+      <Filter>Resources\Styles</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="Views\MainWindow.ui">
+      <Filter>Views</Filter>
+    </QtUic>
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="Resources\MainWindow.qrc">
+      <Filter>Resources</Filter>
+    </QtRcc>
+  </ItemGroup>
+</Project>

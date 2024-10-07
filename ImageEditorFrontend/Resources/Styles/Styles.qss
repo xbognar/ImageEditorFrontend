@@ -9,7 +9,7 @@ QPushButton {
 
 /* Icon buttons */
 QPushButton#openButton,
-QPushButton#saveButton,
+QPushButton#deleteButton,
 QPushButton#cropButton,
 QPushButton#rotateRightButton,
 QPushButton#rotateLeftButton,
@@ -40,8 +40,8 @@ QPushButton#openButton {
     qproperty-icon: url(:/MainWindow/Icons/folder.png);
 }
 
-QPushButton#saveButton {
-    qproperty-icon: url(:/MainWindow/Icons/save.png);
+QPushButton#deleteButton {
+    qproperty-icon: url(:/MainWindow/Icons/delete.png);
 }
 
 /* Filter buttons */

@@ -82,7 +82,7 @@
     <Image Include="Resources\Icons\rotate-right.png">
       <Filter>Resources\Icons</Filter>
     </Image>
-    <Image Include="Resources\Icons\save.png">
+    <Image Include="Resources\Icons\delete.png">
       <Filter>Resources\Icons</Filter>
     </Image>
   </ItemGroup>

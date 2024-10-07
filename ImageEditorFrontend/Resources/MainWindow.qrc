@@ -7,7 +7,7 @@
         <file>Icons/rgb.png</file>
         <file>Icons/rotate-left.png</file>
         <file>Icons/rotate-right.png</file>
-        <file>Icons/save.png</file>
         <file>Styles/Styles.qss</file>
+        <file>Icons/delete.png</file>
     </qresource>
 </RCC>

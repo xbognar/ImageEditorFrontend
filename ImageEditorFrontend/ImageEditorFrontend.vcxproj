@@ -29,13 +29,13 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Icons\crop.png" />
+    <Image Include="Resources\Icons\delete.png" />
     <Image Include="Resources\Icons\filterWoman.jpg" />
     <Image Include="Resources\Icons\flip.png" />
     <Image Include="Resources\Icons\folder.png" />
     <Image Include="Resources\Icons\rgb.png" />
     <Image Include="Resources\Icons\rotate-left.png" />
     <Image Include="Resources\Icons\rotate-right.png" />
-    <Image Include="Resources\Icons\save.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Styles\Styles.qss" />

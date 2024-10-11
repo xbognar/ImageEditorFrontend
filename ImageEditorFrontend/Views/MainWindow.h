@@ -9,7 +9,6 @@
 #include "Models/Image.h"
 #include "Services/ImageService.h"
 #include "Controllers/MainWindowController.h"
-
 #include "ui_MainWindow.h"
 
 class MainWindow : public QMainWindow
@@ -61,13 +60,20 @@ private:
     void applyStylesheet();
     void setupHistogram();
     void displayImages(const QList<Image>& images);
-    void deleteSelectedImage();                   
+    void deleteSelectedImage();
+    void loadFirstImage();
+
+    void addImageToList(const Image& image, bool loadThumbnail);
+    bool isImageInList(const QString& path);
+    QPixmap scaleImageToViewer(const QImage& image);
 
 private slots:
-
+    
     void openFile();
     void loadImages();
     void onImageAdded();
     void onImagesFetched(const QList<Image>& images);
     void exitApp();
+    void onImageSelected(QListWidgetItem* item);
+
 };

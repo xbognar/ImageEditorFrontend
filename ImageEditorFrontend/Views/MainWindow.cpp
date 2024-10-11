@@ -9,6 +9,7 @@
 #include <QPainterPath>
 #include <QResizeEvent>
 #include <QBuffer>
+#include <algorithm>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), firstResizeEvent(true), imageService(new ImageService(this)),
@@ -24,7 +25,6 @@ MainWindow::MainWindow(QWidget* parent)
     rotateRightButton = ui.rotateRightButton;
     rotateLeftButton = ui.rotateLeftButton;
     flipButton = ui.flipButton;
-
     folderButton = ui.openButton;
     deleteButton = ui.deleteButton;
 
@@ -49,9 +49,9 @@ MainWindow::MainWindow(QWidget* parent)
     connect(ui.actionExit, &QAction::triggered, this, &MainWindow::exitApp);
     connect(controller, &MainWindowController::imagesFetched, this, &MainWindow::onImagesFetched);
     connect(controller, &MainWindowController::imageAdded, this, &MainWindow::onImageAdded);
+    connect(imageList, &QListWidget::itemClicked, this, &MainWindow::onImageSelected);
 
     loadImages();
-    firstResizeEvent = true;
 }
 
 MainWindow::~MainWindow()
@@ -182,45 +182,89 @@ void MainWindow::resizeEvent(QResizeEvent* event)
 
 void MainWindow::openFile()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), "", tr("Image Files (*.png *.jpg *.bmp)"));
-    if (!fileName.isEmpty()) {
-        QImage image(fileName);
-        if (image.isNull()) {
-            QMessageBox::warning(this, tr("Open Image"), tr("Could not open image."));
-            return;
+    QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Open Images"), "", tr("Image Files (*.png *.jpg *.bmp)"));
+    if (!fileNames.isEmpty()) {
+        for (int i = 0; i < fileNames.size(); ++i) {
+            QString fileName = fileNames[i];
+            if (fileName.isEmpty() || isImageInList(fileName)) continue;
+
+            if (i == 0) {
+                
+                QImage image(fileName);
+                if (!image.isNull()) {
+                    QByteArray imageData;
+                    QBuffer buffer(&imageData);
+                    if (buffer.open(QIODevice::WriteOnly)) {
+                        image.save(&buffer, "PNG");
+                        buffer.close();
+                    }
+                    Image newImage;
+                    newImage.name = QFileInfo(fileName).fileName();
+                    newImage.imageData = imageData;
+                    newImage.width = image.width();
+                    newImage.height = image.height();
+                    newImage.pixelFormat = "RGBA";
+                    newImage.path = fileName;
+
+                    imageViewer->setPixmap(scaleImageToViewer(image));
+                    controller->addNewImage(newImage);
+                    images.append(newImage);
+                    addImageToList(newImage, true);
+                }
+            }
+            else {
+                
+                Image imageMeta;
+                imageMeta.name = QFileInfo(fileName).fileName();
+                imageMeta.path = fileName;
+                images.append(imageMeta);
+                addImageToList(imageMeta, false);
+            }
         }
-
-        QByteArray imageData;
-        QBuffer buffer(&imageData);
-        if (buffer.open(QIODevice::WriteOnly)) {
-            image.save(&buffer, "PNG");
-            buffer.close();
-        }
-
-        Image newImage;
-        newImage.name = QFileInfo(fileName).fileName();
-        newImage.imageData = imageData;
-        newImage.width = image.width();
-        newImage.height = image.height();
-        newImage.pixelFormat = "RGBA";
-        newImage.path = fileName;
-
-        controller->addNewImage(newImage);
     }
+}
+
+void MainWindow::addImageToList(const Image& image, bool loadThumbnail)
+{
+    QIcon icon = loadThumbnail && !image.imageData.isEmpty()
+        ? QIcon(QPixmap::fromImage(QImage::fromData(image.imageData).scaled(50, 50, Qt::KeepAspectRatio)))
+        : QIcon("C:/Users/matth/JobPractice/ImageEditorFrontend/ImageEditorFrontend/Resources/Icons/placeholder.png");
+    QListWidgetItem* item = new QListWidgetItem(icon, QString("%1 | %2 | %3x%4")
+        .arg(image.id).arg(image.name).arg(image.width).arg(image.height));
+    item->setData(Qt::UserRole, QVariant::fromValue(image));
+    imageList->addItem(item);
+}
+
+bool MainWindow::isImageInList(const QString& path)
+{
+    return std::any_of(images.begin(), images.end(), [&path](const Image& img) {
+        return img.path == path;
+        });
+}
+
+QPixmap MainWindow::scaleImageToViewer(const QImage& image)
+{
+    QSize viewerSize = imageViewer->size();
+    QPixmap pixmap = QPixmap::fromImage(image);
+    return pixmap.scaled(viewerSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 }
 
 void MainWindow::deleteSelectedImage()
 {
     QListWidgetItem* selectedItem = imageList->currentItem();
-    if (!selectedItem) {
-        QMessageBox::warning(this, tr("Delete Image"), tr("No image selected."));
-        return;
-    }
+    if (!selectedItem) return;
 
     Image selectedImage = selectedItem->data(Qt::UserRole).value<Image>();
     controller->deleteImage(selectedImage.id);
     images.removeOne(selectedImage);
     delete selectedItem;
+
+    if (!images.isEmpty()) {
+        onImageSelected(imageList->item(0));
+    }
+    else {
+        imageViewer->clear();
+    }
 }
 
 void MainWindow::loadImages()
@@ -232,11 +276,18 @@ void MainWindow::displayImages(const QList<Image>& images)
 {
     imageList->clear();
     for (const Image& img : images) {
-        QPixmap thumbnail = QPixmap::fromImage(QImage::fromData(img.imageData).scaled(50, 50, Qt::KeepAspectRatio));
-        QListWidgetItem* item = new QListWidgetItem(QIcon(thumbnail), QString("%1 | %2 | %3x%4")
-            .arg(img.id).arg(img.name).arg(img.width).arg(img.height));
-        item->setData(Qt::UserRole, QVariant::fromValue(img));
-        imageList->addItem(item);
+        addImageToList(img, !img.imageData.isEmpty());
+    }
+}
+
+void MainWindow::loadFirstImage()
+{
+    if (!images.isEmpty()) {
+        Image firstImage = images.first();
+        QImage image(firstImage.path);
+        if (!image.isNull()) {
+            imageViewer->setPixmap(scaleImageToViewer(image));
+        }
     }
 }
 
@@ -245,14 +296,43 @@ void MainWindow::exitApp()
     QApplication::quit();
 }
 
-// Function to handle the images fetched signal - CONTROLLER
-
-void MainWindow::onImagesFetched(const QList<Image>& images)
+void MainWindow::onImagesFetched(const QList<Image>& fetchedImages)
 {
+    images = fetchedImages;
     displayImages(images);
+    loadFirstImage();
 }
 
 void MainWindow::onImageAdded()
 {
     loadImages();
+}
+
+void MainWindow::onImageSelected(QListWidgetItem* item)
+{
+    // Get a copy of the Image object from the QVariant
+    Image selectedImage = item->data(Qt::UserRole).value<Image>();
+
+    // Load binary data only if not already loaded
+    if (selectedImage.imageData.isEmpty()) {
+        QImage image(selectedImage.path);
+        if (!image.isNull()) {
+            QByteArray imageData;
+            QBuffer buffer(&imageData);
+            if (buffer.open(QIODevice::WriteOnly)) {
+                image.save(&buffer, "PNG");
+                buffer.close();
+            }
+            selectedImage.imageData = imageData;
+
+            // Update the item with the new thumbnail
+            item->setIcon(QIcon(QPixmap::fromImage(image).scaled(50, 50, Qt::KeepAspectRatio)));
+
+            // Store the updated Image object back in the QListWidgetItem
+            item->setData(Qt::UserRole, QVariant::fromValue(selectedImage));
+        }
+    }
+
+    // Display the image in the viewer
+    imageViewer->setPixmap(scaleImageToViewer(QImage::fromData(selectedImage.imageData)));
 }

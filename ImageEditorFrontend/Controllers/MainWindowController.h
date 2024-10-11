@@ -3,7 +3,6 @@
 
 #include <QObject>
 #include <QList>
-#include <QtConcurrent>
 #include "Models/Image.h"
 #include "Services/ImageService.h"
 
@@ -13,18 +12,17 @@ class MainWindowController : public QObject {
 public:
     explicit MainWindowController(ImageService* imageService, QObject* parent = nullptr);
 
-    void fetchImages();
-    void fetchImageById(int id);
-    void addNewImage(const Image& image);
-    void updateImage(int id, const Image& image);
-    void deleteImage(int id);
+    void fetchImagesAsync();
+    void addImageAsync(const Image& image);
+    void updateImageAsync(int id, const Image& image);
+    void deleteImageAsync(int id);
 
 signals:
     void imagesFetched(const QList<Image>& images);
-    void imageFetched(const Image& image);
-    void imageAdded();
-    void imageUpdated();
-    void imageDeleted();
+    void imageAdded(const Image& image);
+    void imageUpdated(int id);
+    void imageDeleted(int id);
+    void operationFailed(const QString& error);
 
 private:
     ImageService* imageService;

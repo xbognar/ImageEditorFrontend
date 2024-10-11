@@ -1,10 +1,14 @@
 #include "MainWindowController.h"
+#include <QtConcurrent>
+#include <QFuture>
+#include <QFutureWatcher>
+#include <QDebug>
 
 MainWindowController::MainWindowController(ImageService* service, QObject* parent)
     : QObject(parent), imageService(service) {}
 
-// Fetch images asynchronously
-void MainWindowController::fetchImages() {
+void MainWindowController::fetchImagesAsync() {
+    
     QFuture<QList<Image>> future = QtConcurrent::run([this]() {
         return imageService->getAllImages();
         });
@@ -19,61 +23,46 @@ void MainWindowController::fetchImages() {
     watcher->setFuture(future);
 }
 
-// Fetch a single image asynchronously
-void MainWindowController::fetchImageById(int id) {
-    QFuture<Image> future = QtConcurrent::run([this, id]() {
-        return imageService->getImageById(id);
+void MainWindowController::addImageAsync(const Image& image) {
+    
+    QFuture<Image> future = QtConcurrent::run([this, image]() {
+        return imageService->addImage(image);
         });
 
     QFutureWatcher<Image>* watcher = new QFutureWatcher<Image>(this);
     connect(watcher, &QFutureWatcher<Image>::finished, [this, watcher]() {
-        Image image = watcher->result();
-        emit imageFetched(image);
+        Image newImage = watcher->result();
+        emit imageAdded(newImage);
         watcher->deleteLater();
         });
 
     watcher->setFuture(future);
 }
 
-// Add a new image asynchronously
-void MainWindowController::addNewImage(const Image& image) {
-    QFuture<void> future = QtConcurrent::run([this, image]() {
-        imageService->addImage(image);
-        });
-
-    QFutureWatcher<void>* watcher = new QFutureWatcher<void>(this);
-    connect(watcher, &QFutureWatcher<void>::finished, [this, watcher]() {
-        emit imageAdded();
-        watcher->deleteLater();
-        });
-
-    watcher->setFuture(future);
-}
-
-// Update an existing image asynchronously
-void MainWindowController::updateImage(int id, const Image& image) {
+void MainWindowController::updateImageAsync(int id, const Image& image) {
+    
     QFuture<void> future = QtConcurrent::run([this, id, image]() {
         imageService->updateImage(id, image);
         });
 
     QFutureWatcher<void>* watcher = new QFutureWatcher<void>(this);
-    connect(watcher, &QFutureWatcher<void>::finished, [this, watcher]() {
-        emit imageUpdated();
+    connect(watcher, &QFutureWatcher<void>::finished, [this, watcher, id]() {
+        emit imageUpdated(id);
         watcher->deleteLater();
         });
 
     watcher->setFuture(future);
 }
 
-// Delete an image asynchronously
-void MainWindowController::deleteImage(int id) {
+void MainWindowController::deleteImageAsync(int id) {
+    
     QFuture<void> future = QtConcurrent::run([this, id]() {
         imageService->deleteImage(id);
         });
 
     QFutureWatcher<void>* watcher = new QFutureWatcher<void>(this);
-    connect(watcher, &QFutureWatcher<void>::finished, [this, watcher]() {
-        emit imageDeleted();
+    connect(watcher, &QFutureWatcher<void>::finished, [this, watcher, id]() {
+        emit imageDeleted(id);
         watcher->deleteLater();
         });
 

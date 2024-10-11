@@ -12,11 +12,11 @@ class ImageService : public BaseService {
 public:
     explicit ImageService(QObject* parent = nullptr);
 
-    QList<Image> getAllImages();            
-    Image getImageById(int id);             
-    void addImage(const Image& image);      
-    void updateImage(int id, const Image& image); 
-    void deleteImage(int id);               
+    QList<Image> getAllImages();
+    Image getImageById(int id);
+    Image addImage(const Image& image);
+    void updateImage(int id, const Image& image);
+    void deleteImage(int id);
 };
 
 #endif // IMAGESERVICE_H

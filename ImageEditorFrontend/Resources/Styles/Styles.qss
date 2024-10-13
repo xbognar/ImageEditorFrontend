@@ -1,21 +1,18 @@
-/* General Button Styles */
 QPushButton {
-    background-color: #f5f5dc;  /* Creamy white background */
-    border: none;               /* Remove border for a cleaner look */
-    border-radius: 0px;         /* Square corners */
+    background-color: #f5f5dc;  
+    border: none;               
+    border-radius: 0px;         
     padding: 5px;
     color: white;
 }
 
-/* Ensure the button container has the same creamy white background */
 QWidget#buttonContainer {
-    background-color: #f5f5dc;  /* Match the container background */
+    background-color: #f5f5dc;  
     border: none;
     margin: 0;
     padding: 0;
 }
 
-/* Icon buttons - Left Side */
 QPushButton#openButton,
 QPushButton#deleteButton,
 QPushButton#cropButton,
@@ -24,13 +21,12 @@ QPushButton#rotateLeftButton,
 QPushButton#flipButton {
     width: 64px;
     height: 64px;
-    qproperty-iconSize: 30px 30px;  /* Icon size */
-    background-color: #f5f5dc;       /* Uniform creamy white */
+    qproperty-iconSize: 30px 30px; 
+    background-color: #f5f5dc;      
     border: none;
-    border-radius: 0px;              /* Square corners */
+    border-radius: 0px; 
 }
 
-/* Individual icons for left-side buttons */
 QPushButton#cropButton {
     qproperty-icon: url(:/MainWindow/Icons/crop.png);
 }
@@ -50,20 +46,18 @@ QPushButton#deleteButton {
     qproperty-icon: url(:/MainWindow/Icons/delete.png);
 }
 
-/* Filter buttons - Right Side */
 QPushButton#filter1Button,
 QPushButton#filter2Button,
 QPushButton#filter3Button,
 QPushButton#filter4Button {
     width: 64px;
     height: 64px;
-    qproperty-iconSize: 50px 60px;  /* Slightly larger icons */
-    background-color: #f5f5dc;      /* Creamy white */
+    qproperty-iconSize: 50px 60px; 
+    background-color: #f5f5dc;    
     border: none;
     border-radius: 0px;
 }
 
-/* Filter icon paths */
 QPushButton#filter1Button {
     qproperty-icon: url(:/MainWindow/Icons/filterWoman.jpg);
 }
@@ -77,42 +71,39 @@ QPushButton#filter4Button {
     qproperty-icon: url(:/MainWindow/Icons/filterWoman.jpg);
 }
 
-/* RGB Buttons - Adjusted Dimensions */
 QPushButton#redRGBButton,
 QPushButton#blueRGBButton,
 QPushButton#greenRGBButton {
-    width: 30px;                   /* 5 pixels smaller */
-    height: 30px;                  /* 5 pixels smaller */
+    width: 30px;                   
+    height: 30px;                  
     qproperty-iconSize: 25px 25px;
     border-radius: 0px;
 }
 
-/* RGB Button Colors */
 QPushButton#redRGBButton {
-    background-color: rgb(200, 100, 100);  /* Soft red */
+    background-color: rgb(200, 100, 100);
     qproperty-icon: url(:/MainWindow/Icons/rgb.png);
 }
 QPushButton#blueRGBButton {
-    background-color: rgb(100, 100, 200);  /* Soft blue */
+    background-color: rgb(100, 100, 200);
     qproperty-icon: url(:/MainWindow/Icons/rgb.png);
 }
 QPushButton#greenRGBButton {
-    background-color: rgb(100, 200, 100);  /* Soft green */
+    background-color: rgb(100, 200, 100); 
     qproperty-icon: url(:/MainWindow/Icons/rgb.png);
 }
 
-/* Label Styles */
 QLabel#filter1Label,
 QLabel#filter2Label,
 QLabel#filter3Label,
 QLabel#filter4Label {
-    color: black;             /* Black text color for visibility */
+    color: black;           
     font-size: 8pt;
     font-weight: bold;
-    background-color: #f5f5dc; /* Match the creamy white */
+    background-color: #f5f5dc;
 }
 
 QLabel#histogramViewer {
-    border: 1px solid #d3d3c9;  /* Match creamy tone for border */
-    background-color: #4b4b4b;  /* Maintain gray background for contrast */
+    border: 1px solid #d3d3c9;  
+    background-color: #4b4b4b;  
 }

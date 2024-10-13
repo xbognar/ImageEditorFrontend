@@ -28,4 +28,4 @@ private:
     ImageService* imageService;
 };
 
-#endif // MAINWINDOWCONTROLLER_H
+#endif

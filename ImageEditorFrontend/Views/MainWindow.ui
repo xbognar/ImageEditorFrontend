@@ -122,7 +122,7 @@
     <property name="geometry">
      <rect>
       <x>1100</x>
-      <y>20</y>
+      <y>90</y>
       <width>54</width>
       <height>48</height>
      </rect>
@@ -135,7 +135,7 @@
     <property name="geometry">
      <rect>
       <x>1107</x>
-      <y>75</y>
+      <y>142</y>
       <width>41</width>
       <height>16</height>
      </rect>
@@ -148,7 +148,7 @@
     <property name="geometry">
      <rect>
       <x>1107</x>
-      <y>155</y>
+      <y>222</y>
       <width>41</width>
       <height>16</height>
      </rect>
@@ -161,7 +161,7 @@
     <property name="geometry">
      <rect>
       <x>1100</x>
-      <y>100</y>
+      <y>170</y>
       <width>54</width>
       <height>48</height>
      </rect>
@@ -174,7 +174,7 @@
     <property name="geometry">
      <rect>
       <x>1107</x>
-      <y>235</y>
+      <y>302</y>
       <width>41</width>
       <height>16</height>
      </rect>
@@ -187,7 +187,7 @@
     <property name="geometry">
      <rect>
       <x>1100</x>
-      <y>180</y>
+      <y>250</y>
       <width>54</width>
       <height>48</height>
      </rect>
@@ -200,7 +200,7 @@
     <property name="geometry">
      <rect>
       <x>1107</x>
-      <y>315</y>
+      <y>382</y>
       <width>41</width>
       <height>16</height>
      </rect>
@@ -213,7 +213,7 @@
     <property name="geometry">
      <rect>
       <x>1100</x>
-      <y>260</y>
+      <y>330</y>
       <width>54</width>
       <height>48</height>
      </rect>
@@ -225,10 +225,10 @@
    <widget class="QPushButton" name="redRGBButton">
     <property name="geometry">
      <rect>
-      <x>1100</x>
+      <x>1105</x>
       <y>450</y>
-      <width>51</width>
-      <height>41</height>
+      <width>45</width>
+      <height>40</height>
      </rect>
     </property>
     <property name="text">
@@ -238,10 +238,10 @@
    <widget class="QPushButton" name="blueRGBButton">
     <property name="geometry">
      <rect>
-      <x>1100</x>
+      <x>1105</x>
       <y>500</y>
-      <width>51</width>
-      <height>41</height>
+      <width>45</width>
+      <height>40</height>
      </rect>
     </property>
     <property name="text">
@@ -251,10 +251,10 @@
    <widget class="QPushButton" name="greenRGBButton">
     <property name="geometry">
      <rect>
-      <x>1100</x>
+      <x>1105</x>
       <y>550</y>
-      <width>51</width>
-      <height>41</height>
+      <width>45</width>
+      <height>40</height>
      </rect>
     </property>
     <property name="text">

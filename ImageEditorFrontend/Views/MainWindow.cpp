@@ -83,10 +83,10 @@ void MainWindow::applyStylesheet()
 void MainWindow::setupHistogram()
 {
     histogramViewer->setFixedSize(340, 251);
-    histogramViewer->setStyleSheet("background-color: #4b4b4b;");
+    histogramViewer->setStyleSheet("background-color: #f5f5dc;");
 
     histogramImage = new QImage(340, 251, QImage::Format_RGB32);
-    histogramImage->fill(QColor("#4b4b4b"));
+    histogramImage->fill(QColor("#f5f5dc"));
 
     QPainter painter(histogramImage);
     painter.setRenderHint(QPainter::Antialiasing);
@@ -95,17 +95,17 @@ void MainWindow::setupHistogram()
     path.addRoundedRect(0, 0, histogramImage->width(), histogramImage->height(), 40, 40);
     painter.setClipPath(path);
 
-    QPen axisPen(Qt::white, 1.5);
+    QPen axisPen(Qt::black, 1.5);
     painter.setPen(axisPen);
 
     int xAxisStartX = 30;
     int xAxisStartY = histogramImage->height() - 30;
     int yAxisStartX = 30;
     int yAxisStartY = 30;
-    painter.drawLine(xAxisStartX, xAxisStartY, 315, xAxisStartY);
+    painter.drawLine(xAxisStartX, xAxisStartY, 315, xAxisStartY); 
     painter.drawLine(xAxisStartX, xAxisStartY, xAxisStartX, yAxisStartY);
 
-    QPen arrowPen(Qt::white, 1.5);
+    QPen arrowPen(Qt::black, 1.5);
     painter.setPen(arrowPen);
 
     painter.drawLine(315, xAxisStartY, 305, xAxisStartY - 5);
@@ -133,7 +133,7 @@ void MainWindow::resizeEvent(QResizeEvent* event)
     const int bottomPadding = 30;
     const int columnWidth = 250;
     const int histogramSize = 270;
-    const int buttonGap = 30;
+    const int buttonGap = 25;
     const int baseGapBetweenRGBAndFilters = 150;
 
     if (newSize.width() < 800) {
@@ -168,15 +168,15 @@ void MainWindow::resizeEvent(QResizeEvent* event)
     flipButton->move(buttonPadding, rotateLeftButton->geometry().bottom() + proportionalLeftButtonSpacing);
 
     int rightButtonXOffset = newSize.width() - buttonWidth - padding - 15;
-    filter1Button->move(rightButtonXOffset, buttonGap + 20);
+    filter1Button->move(rightButtonXOffset, buttonGap + 70);
     filter2Button->move(rightButtonXOffset, filter1Button->geometry().bottom() + buttonGap);
     filter3Button->move(rightButtonXOffset, filter2Button->geometry().bottom() + buttonGap);
     filter4Button->move(rightButtonXOffset, filter3Button->geometry().bottom() + buttonGap);
 
-    int dynamicGapBetweenFilterAndRGB = baseGapBetweenRGBAndFilters + (newSize.height() - 700);
-    redRGBButton->move(rightButtonXOffset, filter4Button->geometry().bottom() + dynamicGapBetweenFilterAndRGB);
-    blueRGBButton->move(rightButtonXOffset, redRGBButton->geometry().bottom() + buttonGap - 20);
-    greenRGBButton->move(rightButtonXOffset, blueRGBButton->geometry().bottom() + buttonGap - 20);
+    int dynamicGapBetweenFilterAndRGB = baseGapBetweenRGBAndFilters + (newSize.height() - 710);
+    redRGBButton->move(rightButtonXOffset + 5, filter4Button->geometry().bottom() + dynamicGapBetweenFilterAndRGB);
+    blueRGBButton->move(rightButtonXOffset + 5, redRGBButton->geometry().bottom() + buttonGap - 20);
+    greenRGBButton->move(rightButtonXOffset + 5, blueRGBButton->geometry().bottom() + buttonGap - 20);
 
     filter1Label->move(filter1Button->geometry().left() + (filter1Button->width() / 2) - (filter1Label->width() / 2), filter1Button->geometry().bottom() + 5);
     filter2Label->move(filter2Button->geometry().left() + (filter2Button->width() / 2) - (filter2Label->width() / 2), filter2Button->geometry().bottom() + 5);
@@ -186,6 +186,41 @@ void MainWindow::resizeEvent(QResizeEvent* event)
     QMainWindow::resizeEvent(event);
 
     updateImageDisplay();
+}
+
+void MainWindow::paintEvent(QPaintEvent* event)
+{
+    QMainWindow::paintEvent(event);
+
+    QPainter painter(this);
+    drawColumnsAndCircles(painter);
+}
+
+void MainWindow::drawColumnsAndCircles(QPainter& painter)
+{
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(QBrush(QColor("#f5f5dc")));
+
+    int leftColumnWidth = 55;
+    int leftColumnX = folderButton->x() - 8;
+    int leftColumnY = 45;
+    int leftColumnHeight = flipButton->geometry().bottom() - leftColumnY + 10;
+
+    painter.drawRoundedRect(leftColumnX, leftColumnY, leftColumnWidth, leftColumnHeight + 20, 0, 0);
+
+    int circleDiameter = leftColumnWidth;
+    int circleX = leftColumnX;
+    int circleY = leftColumnY + leftColumnHeight - 10;
+
+    painter.drawEllipse(circleX, circleY, circleDiameter, circleDiameter);
+
+    int rightColumnWidth = 63;
+    int rightColumnX = this->width() - rightColumnWidth - 10; 
+    int rightColumnY = filter1Button->y(); 
+    int rightColumnHeight = this->height() - rightColumnY + 50; 
+
+    painter.drawRoundedRect(rightColumnX, rightColumnY, rightColumnWidth, rightColumnHeight, 30, 35);
 }
 
 void MainWindow::openFile()
@@ -204,7 +239,7 @@ void MainWindow::openFile()
             imageMeta.path = fileName;
 
             if (i == 0) {
-                
+
                 QImage image(fileName);
                 if (!image.isNull()) {
                     imageMeta.width = image.width();
@@ -220,7 +255,7 @@ void MainWindow::openFile()
                     imageMeta.imageData = imageData;
 
                     currentImage = image;
-                    updateImageDisplay(); 
+                    updateImageDisplay();
                     loadedImages.insert(imageMeta.path, image);
                 }
             }
@@ -238,7 +273,7 @@ void MainWindow::openFile()
 void MainWindow::addImageToList(const Image& image)
 {
     QIcon icon;
-    
+
     if (!image.imageData.isEmpty()) {
         QImage img = QImage::fromData(image.imageData).scaled(50, 50, Qt::KeepAspectRatio);
         icon = QIcon(QPixmap::fromImage(img));
@@ -246,7 +281,7 @@ void MainWindow::addImageToList(const Image& image)
     else {
         icon = QIcon(":/MainWindow/Icons/placeholder.png");
     }
-    
+
     QListWidgetItem* item = new QListWidgetItem(icon, QString("%1 | %2 | %3x%4")
         .arg(image.id).arg(image.name).arg(image.width).arg(image.height));
     item->setData(Qt::UserRole, QVariant::fromValue(image));
@@ -263,9 +298,8 @@ bool MainWindow::isImageInList(const QString& path)
 QPixmap MainWindow::scaleImageToViewer(const QImage& image)
 {
     QSize viewerSize = imageViewer->size();
-    QSize adjustedSize = viewerSize - QSize(10, 10);
     QPixmap pixmap = QPixmap::fromImage(image);
-    return pixmap.scaled(adjustedSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    return pixmap.scaled(viewerSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 }
 
 void MainWindow::deleteSelectedImage()
@@ -344,7 +378,7 @@ void MainWindow::onImageAdded(const Image& image)
 
 void MainWindow::onImageUpdated(int id)
 {
-
+    // Implement if needed
 }
 
 void MainWindow::onImageDeleted(int id)
@@ -381,21 +415,21 @@ void MainWindow::onImageSelected(QListWidgetItem* item)
     Image selectedImage = item->data(Qt::UserRole).value<Image>();
 
     if (loadedImages.contains(selectedImage.path)) {
-        
-        currentImage = loadedImages[selectedImage.path]; 
+
+        currentImage = loadedImages[selectedImage.path];
         updateImageDisplay();
 
     }
     else {
-        
+
         QImage image;
         if (!selectedImage.imageData.isEmpty()) {
-            
+
             image = QImage::fromData(selectedImage.imageData);
 
         }
         else if (!selectedImage.path.isEmpty()) {
-            
+
             image.load(selectedImage.path);
             if (!image.isNull()) {
                 selectedImage.width = image.width();
@@ -437,4 +471,3 @@ void MainWindow::updateImageDisplay()
     QPixmap scaledPixmap = pixmap.scaled(viewerSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     imageViewer->setPixmap(scaledPixmap);
 }
-

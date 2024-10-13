@@ -24,6 +24,7 @@ public:
 protected:
 
     void resizeEvent(QResizeEvent* event) override;
+    void paintEvent(QPaintEvent* event) override;
 
 private:
 
@@ -66,6 +67,7 @@ private:
     void deleteSelectedImage();
     void loadFirstImage();
     void updateImageDisplay();
+    void drawColumnsAndCircles(QPainter& painter);
     void addImageToList(const Image& image);
     bool isImageInList(const QString& path);
     QPixmap scaleImageToViewer(const QImage& image);

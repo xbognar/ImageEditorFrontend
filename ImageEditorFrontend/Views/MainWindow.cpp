@@ -44,6 +44,9 @@ MainWindow::MainWindow(QWidget* parent)
     filter3Label = ui.filter3Label;
     filter4Label = ui.filter4Label;
 
+    imageProcessor = new ImageProcessor();
+    channelVisibility = { {"red", false}, {"green", false}, {"blue", false} };
+
     applyStylesheet();
     setupHistogram();
 
@@ -56,6 +59,9 @@ MainWindow::MainWindow(QWidget* parent)
     connect(controller, &MainWindowController::imageUpdated, this, &MainWindow::onImageUpdated);
     connect(controller, &MainWindowController::imageDeleted, this, &MainWindow::onImageDeleted);
     connect(imageList, &QListWidget::itemClicked, this, &MainWindow::onImageSelected);
+    connect(redRGBButton, &QPushButton::clicked, this, [this] { toggleHistogram("red"); });
+    connect(greenRGBButton, &QPushButton::clicked, this, [this] { toggleHistogram("green"); });
+    connect(blueRGBButton, &QPushButton::clicked, this, [this] { toggleHistogram("blue"); });
 
     loadImages();
 }
@@ -412,6 +418,9 @@ void MainWindow::onImageSelected(QListWidgetItem* item)
 {
     if (!item) return;
 
+    channelVisibility = { {"red", false}, {"green", false}, {"blue", false} };
+    updateHistogramDisplay();
+
     Image selectedImage = item->data(Qt::UserRole).value<Image>();
 
     if (loadedImages.contains(selectedImage.path)) {
@@ -470,4 +479,50 @@ void MainWindow::updateImageDisplay()
 
     QPixmap scaledPixmap = pixmap.scaled(viewerSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     imageViewer->setPixmap(scaledPixmap);
+}
+
+void MainWindow::toggleHistogram(const QString& channel) {
+    
+    channelVisibility[channel] = !channelVisibility[channel];
+    updateHistogramDisplay();
+
+}
+
+void MainWindow::updateHistogramDisplay() {
+
+    histogramImage->fill(Qt::white);
+
+    QPainter painter(histogramImage);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    if (channelVisibility["red"]) {
+        QVector<int> redHist = imageProcessor->calculateHistogram(currentImage, "red");
+        drawHistogram(painter, redHist, Qt::red);
+    }
+    if (channelVisibility["green"]) {
+        QVector<int> greenHist = imageProcessor->calculateHistogram(currentImage, "green");
+        drawHistogram(painter, greenHist, Qt::green);
+    }
+    if (channelVisibility["blue"]) {
+        QVector<int> blueHist = imageProcessor->calculateHistogram(currentImage, "blue");
+        drawHistogram(painter, blueHist, Qt::blue);
+    }
+
+    histogramViewer->setPixmap(QPixmap::fromImage(*histogramImage));
+
+}
+
+void MainWindow::drawHistogram(QPainter& painter, const QVector<int>& histogram, QColor color) {
+    
+    painter.setPen(color);
+
+    int maxVal = *std::max_element(histogram.begin(), histogram.end());
+    int width = histogramImage->width();
+    int height = histogramImage->height();
+
+    for (int i = 0; i < histogram.size(); ++i) {
+        int barHeight = (histogram[i] * height) / maxVal;
+        painter.drawLine(i, height, i, height - barHeight);
+    }
+
 }

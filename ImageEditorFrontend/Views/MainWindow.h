@@ -10,6 +10,7 @@
 #include "Models/Image.h"
 #include "Services/ImageService.h"
 #include "Controllers/MainWindowController.h"
+#include "Algorithms/ImageProcessor.h"
 #include "ui_MainWindow.h"
 
 class MainWindow : public QMainWindow
@@ -37,6 +38,7 @@ private:
     QImage* histogramImage;
     ImageService* imageService;
     MainWindowController* controller;
+    ImageProcessor* imageProcessor;
 
     QPushButton* cropButton;
     QPushButton* rotateRightButton;
@@ -60,7 +62,8 @@ private:
     QMap<QString, QImage> loadedImages;
     QImage currentImage;
     bool firstResizeEvent;
-
+    QMap<QString, bool> channelVisibility;
+	
     void applyStylesheet();
     void setupHistogram();
     void displayImages(const QList<Image>& images);
@@ -70,6 +73,9 @@ private:
     void drawColumnsAndCircles(QPainter& painter);
     void addImageToList(const Image& image);
     bool isImageInList(const QString& path);
+    void toggleHistogram(const QString& channel);
+    void updateHistogramDisplay();
+    void drawHistogram(QPainter& painter, const QVector<int>& histogram, QColor color);
     QPixmap scaleImageToViewer(const QImage& image);
 
 private slots:

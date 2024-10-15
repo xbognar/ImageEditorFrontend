@@ -22,6 +22,9 @@
     <Filter Include="Resources\Styles">
       <UniqueIdentifier>{0258791b-c57a-4e0d-a18a-5e43c9235554}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Algorithms">
+      <UniqueIdentifier>{539415d1-1a02-4bc2-8042-60fcf1552956}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Controllers\MainWindowController.cpp">
@@ -40,6 +43,9 @@
       <Filter>Views</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Algorithms\ImageProcessor.cpp">
+      <Filter>Algorithms</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="Controllers\MainWindowController.h">
@@ -58,6 +64,9 @@
   <ItemGroup>
     <ClInclude Include="Models\Image.h">
       <Filter>Models</Filter>
+    </ClInclude>
+    <ClInclude Include="Algorithms\ImageProcessor.h">
+      <Filter>Algorithms</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

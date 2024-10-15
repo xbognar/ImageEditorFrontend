@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Algorithms\ImageProcessor.cpp" />
     <ClCompile Include="Controllers\MainWindowController.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Models\Image.cpp" />
@@ -22,6 +23,7 @@
     <QtMoc Include="Controllers\MainWindowController.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Algorithms\ImageProcessor.h" />
     <ClInclude Include="Models\Image.h" />
     <QtMoc Include="Views\MainWindow.h" />
     <QtMoc Include="Services\ImageService.h" />

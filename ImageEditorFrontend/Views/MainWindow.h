@@ -76,6 +76,7 @@ private:
     void toggleHistogram(const QString& channel);
     void updateHistogramDisplay();
     void drawHistogram(QPainter& painter, const QVector<int>& histogram, QColor color);
+    void drawAxes(QPainter& painter);
     QPixmap scaleImageToViewer(const QImage& image);
 
 private slots:

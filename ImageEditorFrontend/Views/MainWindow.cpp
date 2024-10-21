@@ -88,10 +88,10 @@ void MainWindow::applyStylesheet()
 
 void MainWindow::setupHistogram()
 {
-    histogramViewer->setFixedSize(340, 251);
+    histogramViewer->setFixedSize(370, 270);
     histogramViewer->setStyleSheet("background-color: #f5f5dc;");
 
-    histogramImage = new QImage(340, 251, QImage::Format_RGB32);
+    histogramImage = new QImage(370, 270, QImage::Format_RGB32);
     histogramImage->fill(QColor("#f5f5dc"));
 
     QPainter painter(histogramImage);
@@ -135,7 +135,7 @@ void MainWindow::resizeEvent(QResizeEvent* event)
     const int padding = 20;
     const int leftPadding = 20;
     const int buttonWidth = 35;
-    const int buttonPadding = 300;
+    const int buttonPadding = 310;
     const int bottomPadding = 30;
     const int columnWidth = 250;
     const int histogramSize = 270;
@@ -155,10 +155,10 @@ void MainWindow::resizeEvent(QResizeEvent* event)
         return;
     }
 
-    histogramViewer->move(leftPadding - 10, newSize.height() - histogramSize - bottomPadding - 20);
+    histogramViewer->move(leftPadding - 15, newSize.height() - histogramSize - bottomPadding - 35);
     histogramViewer->resize(histogramSize, histogramSize);
 
-    imageViewer->move(columnWidth + (5.5 * padding), padding);
+    imageViewer->move(columnWidth + (6.7 * padding), padding);
     imageViewer->setFixedSize(newSize.width() - imageViewer->x() - (5 * padding) + 15, newSize.height() - bottomPadding - (3 * padding));
 
     int fileListHeight = histogramViewer->y() - (2 * padding) + 10;
@@ -489,8 +489,8 @@ void MainWindow::toggleHistogram(const QString& channel) {
 }
 
 void MainWindow::updateHistogramDisplay() {
-
-    histogramImage->fill(Qt::white);
+    
+    histogramImage->fill(QColor("#f5f5dc")); 
 
     QPainter painter(histogramImage);
     painter.setRenderHint(QPainter::Antialiasing);
@@ -508,8 +508,9 @@ void MainWindow::updateHistogramDisplay() {
         drawHistogram(painter, blueHist, Qt::blue);
     }
 
-    histogramViewer->setPixmap(QPixmap::fromImage(*histogramImage));
+    drawAxes(painter);
 
+    histogramViewer->setPixmap(QPixmap::fromImage(*histogramImage));
 }
 
 void MainWindow::drawHistogram(QPainter& painter, const QVector<int>& histogram, QColor color) {
@@ -520,9 +521,40 @@ void MainWindow::drawHistogram(QPainter& painter, const QVector<int>& histogram,
     int width = histogramImage->width();
     int height = histogramImage->height();
 
-    for (int i = 0; i < histogram.size(); ++i) {
-        int barHeight = (histogram[i] * height) / maxVal;
-        painter.drawLine(i, height, i, height - barHeight);
-    }
+    int availableHeight = height - 40;
+    int yOffset = 20;
 
+    float scalingFactor = static_cast<float>(availableHeight) / maxVal;
+
+    int barWidth = (width - 40) / histogram.size();
+
+    for (int i = 0; i < histogram.size(); ++i) {
+        
+        int barHeight = histogram[i] * scalingFactor;
+        int xPosition = 30 + (i * barWidth);
+        int yPosition = height - 20;
+
+        painter.drawLine(xPosition, yPosition, xPosition, yPosition - barHeight);
+    }
+}
+
+void MainWindow::drawAxes(QPainter& painter) {
+    
+    QPen axisPen(Qt::black, 1.5);
+    painter.setPen(axisPen);
+
+    int xAxisStartX = 25;
+    int xAxisStartY = histogramImage->height() - 20;
+    int yAxisStartX = 25;
+    int yAxisStartY = 20;
+    int xAxisEndX = histogramImage->width() - 25;
+
+    painter.drawLine(xAxisStartX, xAxisStartY, xAxisEndX, xAxisStartY);
+    painter.drawLine(yAxisStartX, xAxisStartY, yAxisStartX, yAxisStartY);
+
+    painter.drawLine(xAxisEndX, xAxisStartY, xAxisEndX - 10, xAxisStartY - 5);
+    painter.drawLine(xAxisEndX, xAxisStartY, xAxisEndX - 10, xAxisStartY + 5);
+
+    painter.drawLine(yAxisStartX, yAxisStartY, yAxisStartX - 5, yAxisStartY + 10);
+    painter.drawLine(yAxisStartX, yAxisStartY, yAxisStartX + 5, yAxisStartY + 10);
 }

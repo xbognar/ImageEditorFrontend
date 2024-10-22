@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="AlgorithmsTests">
+      <UniqueIdentifier>{d043ece4-cfb2-45d1-a397-871226849408}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="AlgorithmsTests\TestImageProcessor.cpp">
+      <Filter>AlgorithmsTests</Filter>
+    </QtMoc>
+  </ItemGroup>
+</Project>

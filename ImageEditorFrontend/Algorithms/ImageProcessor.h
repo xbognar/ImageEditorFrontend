@@ -7,11 +7,11 @@
 
 class ImageProcessor {
 public:
-    ImageProcessor();
-    QVector<int> calculateHistogram(const QImage& image, const QString& channel);
+
+    static QVector<int> calculateHistogram(const QImage& image, const QString& channel);
 
 private:
-    QVector<int> calculateChannelHistogram(const QImage& image, int channelIndex);
+    static QVector<int> calculateChannelHistogram(const QImage& image, int channelIndex);
 };
 
 #endif // IMAGEPROCESSOR_H

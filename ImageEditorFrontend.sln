@@ -5,6 +5,11 @@ VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageEditorFrontend", "ImageEditorFrontend\ImageEditorFrontend.vcxproj", "{6B8A0B77-2485-4B34-8BB4-A28C9802D9AE}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageEditorTests", "ImageEditorTests\ImageEditorTests.vcxproj", "{7ABF35E3-8CC0-4CCD-B0E0-0CBEB67F1E99}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6B8A0B77-2485-4B34-8BB4-A28C9802D9AE} = {6B8A0B77-2485-4B34-8BB4-A28C9802D9AE}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -15,6 +20,10 @@ Global
 		{6B8A0B77-2485-4B34-8BB4-A28C9802D9AE}.Debug|x64.Build.0 = Debug|x64
 		{6B8A0B77-2485-4B34-8BB4-A28C9802D9AE}.Release|x64.ActiveCfg = Release|x64
 		{6B8A0B77-2485-4B34-8BB4-A28C9802D9AE}.Release|x64.Build.0 = Release|x64
+		{7ABF35E3-8CC0-4CCD-B0E0-0CBEB67F1E99}.Debug|x64.ActiveCfg = Debug|x64
+		{7ABF35E3-8CC0-4CCD-B0E0-0CBEB67F1E99}.Debug|x64.Build.0 = Debug|x64
+		{7ABF35E3-8CC0-4CCD-B0E0-0CBEB67F1E99}.Release|x64.ActiveCfg = Release|x64
+		{7ABF35E3-8CC0-4CCD-B0E0-0CBEB67F1E99}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

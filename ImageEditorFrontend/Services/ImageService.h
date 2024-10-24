@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QList>
-#include "Models/Image.h"
+#include "../Models/Image.h"
 #include "BaseService.h"
 
 class ImageService : public BaseService {

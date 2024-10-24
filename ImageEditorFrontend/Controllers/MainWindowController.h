@@ -3,8 +3,8 @@
 
 #include <QObject>
 #include <QList>
-#include "Models/Image.h"
-#include "Services/ImageService.h"
+#include "../Services/ImageService.h"
+#include "../Models/Image.h"
 
 class MainWindowController : public QObject {
     Q_OBJECT

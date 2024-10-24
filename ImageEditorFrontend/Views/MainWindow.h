@@ -7,11 +7,10 @@
 #include <QListWidget>
 #include <QList>
 #include <QMap>
-#include "Models/Image.h"
-#include "Services/ImageService.h"
-#include "Controllers/MainWindowController.h"
-#include "Algorithms/ImageProcessor.h"
 #include "ui_MainWindow.h"
+#include "../Services/ImageService.h"
+#include "../Controllers/MainWindowController.h"
+#include "../Algorithms/ImageProcessor.h"
 
 class MainWindow : public QMainWindow
 {

@@ -1,8 +1,8 @@
 #include <QtTest/QtTest>
-#include "../ImageEditorFrontend/Algorithms/ImageProcessor.h"
-#include "../ImageEditorFrontend/Algorithms/ImageProcessor.cpp"
 #include <QImage>
 #include <QVector>
+#include "../../ImageEditorFrontend/Algorithms/ImageProcessor.h"
+#include "../../ImageEditorFrontend/Algorithms/ImageProcessor.cpp"
 
 class TestImageProcessor : public QObject
 {

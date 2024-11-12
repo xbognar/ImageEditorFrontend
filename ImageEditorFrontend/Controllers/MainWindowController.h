@@ -36,9 +36,9 @@ signals:
 private:
     
     ImageService* imageService;
-    QMap<QString, QMap<QString, QVector<int>>> histogramCache; // Caching histograms
-    QSet<QString> runningCalculations; // Tracking running calculations
-    QMap<QString, QFutureWatcher<QVector<int>>*> histogramWatchers; // For handling asynchronous operations
+    QMap<QString, QMap<QString, QVector<int>>> histogramCache;
+    QSet<QString> runningCalculations;
+    QMap<QString, QFutureWatcher<QVector<int>>*> histogramWatchers;
 };
 
 #endif // MAINWINDOWCONTROLLER_H

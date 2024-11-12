@@ -12,7 +12,7 @@ ImageService::ImageService(QObject* parent) : BaseService(parent) {}
 
 QList<Image> ImageService::getAllImages() {
 
-    QNetworkRequest request(QUrl("http://localhost:80/api/images"));
+    QNetworkRequest request(QUrl("http://localhost:8080/api/images"));
     QNetworkReply* reply = getNetworkManager()->get(request);
 
     QEventLoop eventLoop;
@@ -47,7 +47,7 @@ QList<Image> ImageService::getAllImages() {
 
 Image ImageService::getImageById(int id) {
 
-    QNetworkRequest request(QUrl("http://localhost:80/api/images/" + QString::number(id)));
+    QNetworkRequest request(QUrl("http://localhost:8080/api/images/" + QString::number(id)));
     QNetworkReply* reply = getNetworkManager()->get(request);
 
     QEventLoop eventLoop;
@@ -77,7 +77,7 @@ Image ImageService::getImageById(int id) {
 
 Image ImageService::addImage(const Image& image) {
 
-    QNetworkRequest request(QUrl("http://localhost:80/api/images"));
+    QNetworkRequest request(QUrl("http://localhost:8080/api/images"));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
     QJsonObject json;
@@ -115,7 +115,7 @@ Image ImageService::addImage(const Image& image) {
 
 void ImageService::updateImage(int id, const Image& image) {
 
-    QNetworkRequest request(QUrl("http://localhost:80/api/images/" + QString::number(id)));
+    QNetworkRequest request(QUrl("http://localhost:8080/api/images/" + QString::number(id)));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
     QJsonObject json;
@@ -143,7 +143,7 @@ void ImageService::updateImage(int id, const Image& image) {
 
 void ImageService::deleteImage(int id) {
 
-    QNetworkRequest request(QUrl("http://localhost:80/api/images/" + QString::number(id)));
+    QNetworkRequest request(QUrl("http://localhost:8080/api/images/" + QString::number(id)));
     QNetworkReply* reply = getNetworkManager()->deleteResource(request);
 
     QEventLoop eventLoop;

@@ -7,6 +7,7 @@
 #include <QListWidget>
 #include <QList>
 #include <QMap>
+#include <QSet>
 #include "ui_MainWindow.h"
 #include "../Services/ImageService.h"
 #include "../Controllers/MainWindowController.h"
@@ -60,9 +61,12 @@ private:
     QList<Image> images;
     QMap<QString, QImage> loadedImages;
     QImage currentImage;
+    QString currentImagePath;
     bool firstResizeEvent;
     QMap<QString, bool> channelVisibility;
-	
+
+    QMap<QString, QMap<QString, QVector<int>>> histogramCache;
+
     void applyStylesheet();
     void setupHistogram();
     void displayImages(const QList<Image>& images);
@@ -88,5 +92,6 @@ private slots:
     void onImageUpdated(int id);
     void onImageDeleted(int id);
     void onImageSelected(QListWidgetItem* item);
+    void onHistogramCalculated(const QString& imageIdentifier, const QString& channel, const QVector<int>& histogram);
 
 };

@@ -68,3 +68,38 @@ void MainWindowController::deleteImageAsync(int id) {
 
     watcher->setFuture(future);
 }
+
+void MainWindowController::calculateHistogramAsync(const QImage& image, const QString& channel, const QString& imageIdentifier) {
+    
+    if (histogramCache.contains(imageIdentifier) && histogramCache[imageIdentifier].contains(channel)) {
+
+        emit histogramCalculated(imageIdentifier, channel, histogramCache[imageIdentifier][channel]);
+        return;
+    }
+
+    QString calcKey = imageIdentifier + channel;
+    if (runningCalculations.contains(calcKey)) {
+        return;
+    }
+
+    runningCalculations.insert(calcKey);
+
+    QFuture<QVector<int>> future = QtConcurrent::run(&ImageProcessor::calculateHistogram, image, channel);
+    QFutureWatcher<QVector<int>>* watcher = new QFutureWatcher<QVector<int>>(this);
+    histogramWatchers[calcKey] = watcher;
+
+    connect(watcher, &QFutureWatcher<QVector<int>>::finished, this, [this, watcher, imageIdentifier, channel, calcKey]() {
+        
+        QVector<int> histogram = watcher->result();
+
+        histogramCache[imageIdentifier][channel] = histogram;
+        runningCalculations.remove(calcKey);
+        watcher->deleteLater();
+        histogramWatchers.remove(calcKey);
+
+        emit histogramCalculated(imageIdentifier, channel, histogram);
+        });
+
+    watcher->setFuture(future);
+}
+

@@ -62,6 +62,7 @@ MainWindow::MainWindow(QWidget* parent)
     connect(redRGBButton, &QPushButton::clicked, this, [this] { toggleHistogram("red"); });
     connect(greenRGBButton, &QPushButton::clicked, this, [this] { toggleHistogram("green"); });
     connect(blueRGBButton, &QPushButton::clicked, this, [this] { toggleHistogram("blue"); });
+    connect(controller, &MainWindowController::histogramCalculated, this, &MainWindow::onHistogramCalculated);
 
     loadImages();
 }
@@ -423,23 +424,24 @@ void MainWindow::onImageSelected(QListWidgetItem* item)
 
     Image selectedImage = item->data(Qt::UserRole).value<Image>();
 
-    if (loadedImages.contains(selectedImage.path)) {
+    if (currentImagePath != selectedImage.path) {
+        histogramCache.remove(currentImagePath);
+    }
 
+    currentImagePath = selectedImage.path;
+
+    if (loadedImages.contains(selectedImage.path)) {
         currentImage = loadedImages[selectedImage.path];
         updateImageDisplay();
-
     }
     else {
-
         QImage image;
         if (!selectedImage.imageData.isEmpty()) {
-
             image = QImage::fromData(selectedImage.imageData);
-
         }
         else if (!selectedImage.path.isEmpty()) {
-
             image.load(selectedImage.path);
+
             if (!image.isNull()) {
                 selectedImage.width = image.width();
                 selectedImage.height = image.height();
@@ -455,7 +457,6 @@ void MainWindow::onImageSelected(QListWidgetItem* item)
 
                 QIcon icon(QPixmap::fromImage(image).scaled(50, 50, Qt::KeepAspectRatio));
                 item->setIcon(icon);
-
                 item->setData(Qt::UserRole, QVariant::fromValue(selectedImage));
 
                 controller->addImageAsync(selectedImage);
@@ -467,6 +468,21 @@ void MainWindow::onImageSelected(QListWidgetItem* item)
             currentImage = image;
             updateImageDisplay();
         }
+    }
+
+    for (const auto& channel : channelVisibility.keys()) {
+        if (channelVisibility[channel]) {
+            controller->calculateHistogramAsync(currentImage, channel, selectedImage.path);
+        }
+    }
+}
+
+void MainWindow::onHistogramCalculated(const QString& imageIdentifier, const QString& channel, const QVector<int>& histogram) {
+    
+    histogramCache[imageIdentifier][channel] = histogram;
+
+    if (currentImagePath == imageIdentifier) {
+        updateHistogramDisplay();
     }
 }
 
@@ -484,28 +500,42 @@ void MainWindow::updateImageDisplay()
 void MainWindow::toggleHistogram(const QString& channel) {
     
     channelVisibility[channel] = !channelVisibility[channel];
-    updateHistogramDisplay();
+    QString imageIdentifier = currentImagePath;
 
+    if (histogramCache.contains(imageIdentifier) && histogramCache[imageIdentifier].contains(channel)) {
+    
+        updateHistogramDisplay();
+        return;
+    }
+
+    controller->calculateHistogramAsync(currentImage, channel, imageIdentifier);
 }
 
 void MainWindow::updateHistogramDisplay() {
-    
-    histogramImage->fill(QColor("#f5f5dc")); 
+    histogramImage->fill(QColor("#f5f5dc"));
 
     QPainter painter(histogramImage);
     painter.setRenderHint(QPainter::Antialiasing);
 
+    QString imageIdentifier = currentImagePath;
+
     if (channelVisibility["red"]) {
-        QVector<int> redHist = imageProcessor->calculateHistogram(currentImage, "red");
-        drawHistogram(painter, redHist, Qt::red);
+        if (histogramCache[imageIdentifier].contains("red")) {
+            QVector<int> redHist = histogramCache[imageIdentifier]["red"];
+            drawHistogram(painter, redHist, Qt::red);
+        }
     }
     if (channelVisibility["green"]) {
-        QVector<int> greenHist = imageProcessor->calculateHistogram(currentImage, "green");
-        drawHistogram(painter, greenHist, Qt::green);
+        if (histogramCache[imageIdentifier].contains("green")) {
+            QVector<int> greenHist = histogramCache[imageIdentifier]["green"];
+            drawHistogram(painter, greenHist, Qt::green);
+        }
     }
     if (channelVisibility["blue"]) {
-        QVector<int> blueHist = imageProcessor->calculateHistogram(currentImage, "blue");
-        drawHistogram(painter, blueHist, Qt::blue);
+        if (histogramCache[imageIdentifier].contains("blue")) {
+            QVector<int> blueHist = histogramCache[imageIdentifier]["blue"];
+            drawHistogram(painter, blueHist, Qt::blue);
+        }
     }
 
     drawAxes(painter);

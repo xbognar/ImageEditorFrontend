@@ -8,8 +8,16 @@
 #include <QApplication>
 #include <QEventLoop>
 
+/**
+ * @brief Constructs the ImageService object.
+ * @param parent The parent QObject.
+ */
 ImageService::ImageService(QObject* parent) : BaseService(parent) {}
 
+/**
+ * @brief Retrieves all images from the server.
+ * @return A QList of Image objects.
+ */
 QList<Image> ImageService::getAllImages() {
 
     QNetworkRequest request(QUrl("http://localhost:8080/api/images"));
@@ -45,6 +53,11 @@ QList<Image> ImageService::getAllImages() {
     return images;
 }
 
+/**
+ * @brief Retrieves a single image by its ID.
+ * @param id The ID of the image to retrieve.
+ * @return The Image object with the specified ID.
+ */
 Image ImageService::getImageById(int id) {
 
     QNetworkRequest request(QUrl("http://localhost:8080/api/images/" + QString::number(id)));
@@ -75,6 +88,11 @@ Image ImageService::getImageById(int id) {
     return image;
 }
 
+/**
+ * @brief Adds a new image to the server.
+ * @param image The Image object to add.
+ * @return The newly added Image object with updated ID.
+ */
 Image ImageService::addImage(const Image& image) {
 
     QNetworkRequest request(QUrl("http://localhost:8080/api/images"));
@@ -104,15 +122,20 @@ Image ImageService::addImage(const Image& image) {
         newImage.id = obj["id"].toInt();
     }
     else {
-        
+
         qDebug() << "Error adding image:" << reply->errorString();
-    
+
     }
 
     reply->deleteLater();
     return newImage;
 }
 
+/**
+ * @brief Updates an existing image on the server.
+ * @param id The ID of the image to update.
+ * @param image The Image object with updated data.
+ */
 void ImageService::updateImage(int id, const Image& image) {
 
     QNetworkRequest request(QUrl("http://localhost:8080/api/images/" + QString::number(id)));
@@ -135,12 +158,16 @@ void ImageService::updateImage(int id, const Image& image) {
     if (reply->error() != QNetworkReply::NoError) {
 
         qDebug() << "Error updating image:" << reply->errorString();
-    
+
     }
 
     reply->deleteLater();
 }
 
+/**
+ * @brief Deletes an image from the server.
+ * @param id The ID of the image to delete.
+ */
 void ImageService::deleteImage(int id) {
 
     QNetworkRequest request(QUrl("http://localhost:8080/api/images/" + QString::number(id)));
@@ -151,9 +178,9 @@ void ImageService::deleteImage(int id) {
     eventLoop.exec();
 
     if (reply->error() != QNetworkReply::NoError) {
-        
+
         qDebug() << "Error deleting image:" << reply->errorString();
-    
+
     }
 
     reply->deleteLater();

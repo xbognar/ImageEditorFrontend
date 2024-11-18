@@ -1,7 +1,11 @@
-
 #include "GrayscaleAlgorithm.h"
 #include <QColor>
 
+/**
+ * @brief Converts the given image to grayscale.
+ * @param image The input QImage.
+ * @return The processed QImage in grayscale.
+ */
 QImage GrayscaleAlgorithm::process(const QImage& image)
 {
     QImage outputImage = image.convertToFormat(QImage::Format_RGB32);

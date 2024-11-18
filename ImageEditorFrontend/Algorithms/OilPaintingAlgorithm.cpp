@@ -1,8 +1,12 @@
-
 #include "OilPaintingAlgorithm.h"
 #include <QColor>
 #include <algorithm>
 
+/**
+ * @brief Applies an oil painting effect to the given image.
+ * @param image The input QImage.
+ * @return The processed QImage with the oil painting effect applied.
+ */
 QImage OilPaintingAlgorithm::process(const QImage& image)
 {
     QImage outputImage = image.convertToFormat(QImage::Format_RGB32);
@@ -13,7 +17,7 @@ QImage OilPaintingAlgorithm::process(const QImage& image)
 
     for (int y = radius; y < height - radius; y++) {
         for (int x = radius; x < width - radius; x++) {
-            
+
             QVector<int> intensityCount(intensityLevels, 0);
             QVector<int> sumR(intensityLevels, 0);
             QVector<int> sumG(intensityLevels, 0);

@@ -12,6 +12,10 @@
 #include <QInputDialog>
 #include <algorithm>
 
+/**
+ * @brief Constructs the MainWindow object and initializes the UI components.
+ * @param parent The parent widget, if any.
+ */
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent),
     firstResizeEvent(true),
@@ -94,6 +98,9 @@ MainWindow::MainWindow(QWidget* parent)
     loadImages();
 }
 
+/**
+ * @brief Destructor for MainWindow. Cleans up allocated resources.
+ */
 MainWindow::~MainWindow()
 {
     delete histogramImage;
@@ -101,6 +108,9 @@ MainWindow::~MainWindow()
     delete controller;
 }
 
+/**
+ * @brief Applies the stylesheet to the application.
+ */
 void MainWindow::applyStylesheet()
 {
     QFile file(":/MainWindow/Styles/Styles.qss");
@@ -114,6 +124,9 @@ void MainWindow::applyStylesheet()
     }
 }
 
+/**
+ * @brief Sets up the histogram viewer with initial settings.
+ */
 void MainWindow::setupHistogram()
 {
     histogramViewer->setFixedSize(370, 270);
@@ -136,7 +149,7 @@ void MainWindow::setupHistogram()
     int xAxisStartY = histogramImage->height() - 30;
     int yAxisStartX = 30;
     int yAxisStartY = 30;
-    painter.drawLine(xAxisStartX, xAxisStartY, 315, xAxisStartY); 
+    painter.drawLine(xAxisStartX, xAxisStartY, 315, xAxisStartY);
     painter.drawLine(xAxisStartX, xAxisStartY, xAxisStartX, yAxisStartY);
 
     QPen arrowPen(Qt::black, 1.5);
@@ -151,6 +164,10 @@ void MainWindow::setupHistogram()
     histogramViewer->setPixmap(QPixmap::fromImage(*histogramImage));
 }
 
+/**
+ * @brief Handles the resize event to adjust UI components accordingly.
+ * @param event The resize event.
+ */
 void MainWindow::resizeEvent(QResizeEvent* event)
 {
     if (firstResizeEvent) {
@@ -222,6 +239,10 @@ void MainWindow::resizeEvent(QResizeEvent* event)
     updateImageDisplay();
 }
 
+/**
+ * @brief Handles the paint event to draw custom UI elements.
+ * @param event The paint event.
+ */
 void MainWindow::paintEvent(QPaintEvent* event)
 {
     QMainWindow::paintEvent(event);
@@ -230,6 +251,10 @@ void MainWindow::paintEvent(QPaintEvent* event)
     drawColumnsAndCircles(painter);
 }
 
+/**
+ * @brief Draws custom columns and circles on the UI for aesthetic purposes.
+ * @param painter The QPainter object used for drawing.
+ */
 void MainWindow::drawColumnsAndCircles(QPainter& painter)
 {
     painter.setRenderHint(QPainter::Antialiasing);
@@ -250,13 +275,16 @@ void MainWindow::drawColumnsAndCircles(QPainter& painter)
     painter.drawEllipse(circleX, circleY, circleDiameter, circleDiameter);
 
     int rightColumnWidth = 63;
-    int rightColumnX = this->width() - rightColumnWidth - 10; 
-    int rightColumnY = filter1Button->y(); 
-    int rightColumnHeight = this->height() - rightColumnY + 50; 
+    int rightColumnX = this->width() - rightColumnWidth - 10;
+    int rightColumnY = filter1Button->y();
+    int rightColumnHeight = this->height() - rightColumnY + 50;
 
     painter.drawRoundedRect(rightColumnX, rightColumnY, rightColumnWidth, rightColumnHeight, 30, 35);
 }
 
+/**
+ * @brief Opens a file dialog to select images and loads them into the application.
+ */
 void MainWindow::openFile()
 {
     static int tempId = -1;
@@ -265,7 +293,8 @@ void MainWindow::openFile()
     if (!fileNames.isEmpty()) {
         for (int i = 0; i < fileNames.size(); ++i) {
             QString fileName = fileNames[i];
-            if (fileName.isEmpty() || isImageInList(fileName)) continue;
+            if (fileName.isEmpty() || isImageInList(fileName))
+                continue;
 
             Image imageMeta;
             imageMeta.id = tempId--;
@@ -305,6 +334,10 @@ void MainWindow::openFile()
     }
 }
 
+/**
+ * @brief Adds an image to the image list widget.
+ * @param image The image metadata to add.
+ */
 void MainWindow::addImageToList(const Image& image)
 {
     QIcon icon;
@@ -323,6 +356,11 @@ void MainWindow::addImageToList(const Image& image)
     imageList->addItem(item);
 }
 
+/**
+ * @brief Checks if an image is already in the image list.
+ * @param path The file path of the image.
+ * @return True if the image is in the list, false otherwise.
+ */
 bool MainWindow::isImageInList(const QString& path)
 {
     return std::any_of(images.begin(), images.end(), [&path](const Image& img) {
@@ -330,6 +368,11 @@ bool MainWindow::isImageInList(const QString& path)
         });
 }
 
+/**
+ * @brief Scales the given image to fit the image viewer.
+ * @param image The image to scale.
+ * @return The scaled QPixmap.
+ */
 QPixmap MainWindow::scaleImageToViewer(const QImage& image)
 {
     QSize viewerSize = imageViewer->size();
@@ -337,10 +380,14 @@ QPixmap MainWindow::scaleImageToViewer(const QImage& image)
     return pixmap.scaled(viewerSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 }
 
+/**
+ * @brief Deletes the currently selected image from the application.
+ */
 void MainWindow::deleteSelectedImage()
 {
     QListWidgetItem* selectedItem = imageList->currentItem();
-    if (!selectedItem) return;
+    if (!selectedItem)
+        return;
 
     Image selectedImage = selectedItem->data(Qt::UserRole).value<Image>();
     controller->deleteImageAsync(selectedImage.id);
@@ -357,11 +404,18 @@ void MainWindow::deleteSelectedImage()
     }
 }
 
+/**
+ * @brief Loads images from the image service asynchronously.
+ */
 void MainWindow::loadImages()
 {
     controller->fetchImagesAsync();
 }
 
+/**
+ * @brief Displays the list of images in the image list widget.
+ * @param images The list of images to display.
+ */
 void MainWindow::displayImages(const QList<Image>& images)
 {
     imageList->clear();
@@ -370,6 +424,9 @@ void MainWindow::displayImages(const QList<Image>& images)
     }
 }
 
+/**
+ * @brief Loads the first image in the image list and displays it.
+ */
 void MainWindow::loadFirstImage()
 {
     if (!images.isEmpty()) {
@@ -378,11 +435,18 @@ void MainWindow::loadFirstImage()
     }
 }
 
+/**
+ * @brief Exits the application.
+ */
 void MainWindow::exitApp()
 {
     QApplication::quit();
 }
 
+/**
+ * @brief Slot called when images are fetched from the image service.
+ * @param fetchedImages The list of images fetched.
+ */
 void MainWindow::onImagesFetched(const QList<Image>& fetchedImages)
 {
     images = fetchedImages;
@@ -390,6 +454,10 @@ void MainWindow::onImagesFetched(const QList<Image>& fetchedImages)
     loadFirstImage();
 }
 
+/**
+ * @brief Slot called when an image is added to the image service.
+ * @param image The image that was added.
+ */
 void MainWindow::onImageAdded(const Image& image)
 {
     for (int i = 0; i < images.size(); ++i) {
@@ -411,6 +479,10 @@ void MainWindow::onImageAdded(const Image& image)
     }
 }
 
+/**
+ * @brief Slot called when an image is deleted from the image service.
+ * @param id The ID of the image that was deleted.
+ */
 void MainWindow::onImageDeleted(int id)
 {
     auto it = std::find_if(images.begin(), images.end(), [id](const Image& img) {
@@ -438,9 +510,14 @@ void MainWindow::onImageDeleted(int id)
     }
 }
 
+/**
+ * @brief Slot called when an image is selected from the image list.
+ * @param item The list widget item representing the selected image.
+ */
 void MainWindow::onImageSelected(QListWidgetItem* item)
 {
-    if (!item) return;
+    if (!item)
+        return;
 
     channelVisibility = { {"red", false}, {"green", false}, {"blue", false} };
     updateHistogramDisplay();
@@ -504,8 +581,14 @@ void MainWindow::onImageSelected(QListWidgetItem* item)
     }
 }
 
-void MainWindow::onHistogramCalculated(const QString& imageIdentifier, const QString& channel, const QVector<int>& histogram) {
-    
+/**
+ * @brief Slot called when a histogram calculation is completed.
+ * @param imageIdentifier The identifier of the image.
+ * @param channel The color channel.
+ * @param histogram The calculated histogram data.
+ */
+void MainWindow::onHistogramCalculated(const QString& imageIdentifier, const QString& channel, const QVector<int>& histogram)
+{
     histogramCache[imageIdentifier][channel] = histogram;
 
     if (currentImagePath == imageIdentifier) {
@@ -513,9 +596,13 @@ void MainWindow::onHistogramCalculated(const QString& imageIdentifier, const QSt
     }
 }
 
+/**
+ * @brief Updates the image display area with the current image.
+ */
 void MainWindow::updateImageDisplay()
 {
-    if (currentImage.isNull()) return;
+    if (currentImage.isNull())
+        return;
 
     QPixmap pixmap = QPixmap::fromImage(currentImage);
     QSize viewerSize = imageViewer->size();
@@ -540,13 +627,16 @@ void MainWindow::updateImageDisplay()
     imageViewer->setPixmap(displayPixmap);
 }
 
-void MainWindow::toggleHistogram(const QString& channel) {
-    
+/**
+ * @brief Toggles the visibility of a histogram channel.
+ * @param channel The color channel to toggle ("red", "green", "blue").
+ */
+void MainWindow::toggleHistogram(const QString& channel)
+{
     channelVisibility[channel] = !channelVisibility[channel];
     QString imageIdentifier = currentImagePath;
 
     if (histogramCache.contains(imageIdentifier) && histogramCache[imageIdentifier].contains(channel)) {
-    
         updateHistogramDisplay();
         return;
     }
@@ -554,7 +644,11 @@ void MainWindow::toggleHistogram(const QString& channel) {
     controller->calculateHistogramAsync(currentImage, channel, imageIdentifier);
 }
 
-void MainWindow::updateHistogramDisplay() {
+/**
+ * @brief Updates the histogram display with the current histogram data.
+ */
+void MainWindow::updateHistogramDisplay()
+{
     histogramImage->fill(QColor("#f5f5dc"));
 
     QPainter painter(histogramImage);
@@ -586,8 +680,14 @@ void MainWindow::updateHistogramDisplay() {
     histogramViewer->setPixmap(QPixmap::fromImage(*histogramImage));
 }
 
-void MainWindow::drawHistogram(QPainter& painter, const QVector<int>& histogram, QColor color) {
-    
+/**
+ * @brief Draws the histogram data onto the histogram image.
+ * @param painter The QPainter object used for drawing.
+ * @param histogram The histogram data to draw.
+ * @param color The color to use for the histogram bars.
+ */
+void MainWindow::drawHistogram(QPainter& painter, const QVector<int>& histogram, QColor color)
+{
     painter.setPen(color);
 
     int maxVal = *std::max_element(histogram.begin(), histogram.end());
@@ -602,7 +702,6 @@ void MainWindow::drawHistogram(QPainter& painter, const QVector<int>& histogram,
     int barWidth = (width - 40) / histogram.size();
 
     for (int i = 0; i < histogram.size(); ++i) {
-        
         int barHeight = histogram[i] * scalingFactor;
         int xPosition = 30 + (i * barWidth);
         int yPosition = height - 20;
@@ -611,8 +710,12 @@ void MainWindow::drawHistogram(QPainter& painter, const QVector<int>& histogram,
     }
 }
 
-void MainWindow::drawAxes(QPainter& painter) {
-    
+/**
+ * @brief Draws the axes on the histogram image.
+ * @param painter The QPainter object used for drawing.
+ */
+void MainWindow::drawAxes(QPainter& painter)
+{
     QPen axisPen(Qt::black, 1.5);
     painter.setPen(axisPen);
 
@@ -632,6 +735,9 @@ void MainWindow::drawAxes(QPainter& painter) {
     painter.drawLine(yAxisStartX, yAxisStartY, yAxisStartX + 5, yAxisStartY + 10);
 }
 
+/**
+ * @brief Saves the current image to a file.
+ */
 void MainWindow::saveImage()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Image"), "", tr("PNG Image (*.png);;JPEG Image (*.jpg)"));
@@ -642,6 +748,9 @@ void MainWindow::saveImage()
     }
 }
 
+/**
+ * @brief Rotates the current image 90 degrees to the right.
+ */
 void MainWindow::rotateImageRight()
 {
     currentImage = currentImage.transformed(QTransform().rotate(90));
@@ -649,6 +758,9 @@ void MainWindow::rotateImageRight()
     updateImageDisplay();
 }
 
+/**
+ * @brief Rotates the current image 90 degrees to the left.
+ */
 void MainWindow::rotateImageLeft()
 {
     currentImage = currentImage.transformed(QTransform().rotate(-90));
@@ -656,6 +768,9 @@ void MainWindow::rotateImageLeft()
     updateImageDisplay();
 }
 
+/**
+ * @brief Flips the current image horizontally.
+ */
 void MainWindow::flipImage()
 {
     currentImage = currentImage.mirrored(true, false);
@@ -663,6 +778,10 @@ void MainWindow::flipImage()
     updateImageDisplay();
 }
 
+/**
+ * @brief Handles the mouse press event for cropping functionality.
+ * @param event The mouse event.
+ */
 void MainWindow::mousePressEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::LeftButton && isCropMode) {
@@ -675,6 +794,10 @@ void MainWindow::mousePressEvent(QMouseEvent* event)
     }
 }
 
+/**
+ * @brief Handles the mouse move event for cropping functionality.
+ * @param event The mouse event.
+ */
 void MainWindow::mouseMoveEvent(QMouseEvent* event)
 {
     if (isCropping && isCropMode) {
@@ -684,6 +807,10 @@ void MainWindow::mouseMoveEvent(QMouseEvent* event)
     }
 }
 
+/**
+ * @brief Handles the mouse release event for cropping functionality.
+ * @param event The mouse event.
+ */
 void MainWindow::mouseReleaseEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::LeftButton && isCropping && isCropMode) {
@@ -711,12 +838,19 @@ void MainWindow::mouseReleaseEvent(QMouseEvent* event)
     }
 }
 
+/**
+ * @brief Initiates the cropping mode for the image.
+ */
 void MainWindow::cropImage()
 {
     isCropMode = true;
     cropRect = QRect();
 }
 
+/**
+ * @brief Slot called when a filter button is clicked.
+ * @param filterType The type of filter to apply.
+ */
 void MainWindow::onFilterButtonClicked(int filterType)
 {
     if (currentImage.isNull()) {
@@ -735,6 +869,11 @@ void MainWindow::onFilterButtonClicked(int filterType)
     }
 }
 
+/**
+ * @brief Slot called when a filtered image is ready to be displayed.
+ * @param filteredImage The filtered image.
+ * @param filterType The type of filter applied.
+ */
 void MainWindow::displayFilteredResult(const QImage& filteredImage, MainWindowController::FilterType filterType)
 {
     if (currentFilter == filterType) {
@@ -742,4 +881,3 @@ void MainWindow::displayFilteredResult(const QImage& filteredImage, MainWindowCo
         updateImageDisplay();
     }
 }
-

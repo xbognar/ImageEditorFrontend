@@ -8,14 +8,22 @@
 #include <QCryptographicHash>
 #include <QDebug>
 
+/**
+ * @brief Constructs the MainWindowController object.
+ * @param service The ImageService instance for image operations.
+ * @param parent The parent QObject.
+ */
 MainWindowController::MainWindowController(ImageService* service, QObject* parent)
     : QObject(parent), imageService(service)
 {
     filterCache.clear();
 }
 
-void MainWindowController::fetchImagesAsync() {
-    
+/**
+ * @brief Fetches images asynchronously from the image service.
+ */
+void MainWindowController::fetchImagesAsync()
+{
     QFuture<QList<Image>> future = QtConcurrent::run([this]() {
         return imageService->getAllImages();
         });
@@ -30,8 +38,12 @@ void MainWindowController::fetchImagesAsync() {
     watcher->setFuture(future);
 }
 
-void MainWindowController::addImageAsync(const Image& image) {
-    
+/**
+ * @brief Adds an image asynchronously to the image service.
+ * @param image The image to add.
+ */
+void MainWindowController::addImageAsync(const Image& image)
+{
     QFuture<Image> future = QtConcurrent::run([this, image]() {
         return imageService->addImage(image);
         });
@@ -46,8 +58,13 @@ void MainWindowController::addImageAsync(const Image& image) {
     watcher->setFuture(future);
 }
 
-void MainWindowController::updateImageAsync(int id, const Image& image) {
-    
+/**
+ * @brief Updates an image asynchronously in the image service.
+ * @param id The ID of the image to update.
+ * @param image The updated image data.
+ */
+void MainWindowController::updateImageAsync(int id, const Image& image)
+{
     QFuture<void> future = QtConcurrent::run([this, id, image]() {
         imageService->updateImage(id, image);
         });
@@ -61,8 +78,12 @@ void MainWindowController::updateImageAsync(int id, const Image& image) {
     watcher->setFuture(future);
 }
 
-void MainWindowController::deleteImageAsync(int id) {
-    
+/**
+ * @brief Deletes an image asynchronously from the image service.
+ * @param id The ID of the image to delete.
+ */
+void MainWindowController::deleteImageAsync(int id)
+{
     QFuture<void> future = QtConcurrent::run([this, id]() {
         imageService->deleteImage(id);
         });
@@ -76,10 +97,15 @@ void MainWindowController::deleteImageAsync(int id) {
     watcher->setFuture(future);
 }
 
-void MainWindowController::calculateHistogramAsync(const QImage& image, const QString& channel, const QString& imageIdentifier) {
-    
+/**
+ * @brief Calculates the histogram of an image asynchronously.
+ * @param image The image to process.
+ * @param channel The color channel ("red", "green", "blue").
+ * @param imageIdentifier A unique identifier for the image.
+ */
+void MainWindowController::calculateHistogramAsync(const QImage& image, const QString& channel, const QString& imageIdentifier)
+{
     if (histogramCache.contains(imageIdentifier) && histogramCache[imageIdentifier].contains(channel)) {
-
         emit histogramCalculated(imageIdentifier, channel, histogramCache[imageIdentifier][channel]);
         return;
     }
@@ -96,7 +122,6 @@ void MainWindowController::calculateHistogramAsync(const QImage& image, const QS
     histogramWatchers[calcKey] = watcher;
 
     connect(watcher, &QFutureWatcher<QVector<int>>::finished, this, [this, watcher, imageIdentifier, channel, calcKey]() {
-        
         QVector<int> histogram = watcher->result();
 
         histogramCache[imageIdentifier][channel] = histogram;
@@ -110,6 +135,11 @@ void MainWindowController::calculateHistogramAsync(const QImage& image, const QS
     watcher->setFuture(future);
 }
 
+/**
+ * @brief Applies a filter to an image asynchronously.
+ * @param image The image to filter.
+ * @param filterType The type of filter to apply.
+ */
 void MainWindowController::applyFilter(const QImage& image, FilterType filterType)
 {
     QString cacheKey = generateCacheKey(image, filterType);
@@ -149,30 +179,56 @@ void MainWindowController::applyFilter(const QImage& image, FilterType filterTyp
     watcher->setFuture(future);
 }
 
+/**
+ * @brief Applies the oil painting filter to an image.
+ * @param image The image to filter.
+ * @return The filtered image.
+ */
 QImage MainWindowController::applyOilPaintingFilter(const QImage& image)
 {
     OilPaintingAlgorithm algorithm;
     return algorithm.process(image);
 }
 
+/**
+ * @brief Applies the grayscale filter to an image.
+ * @param image The image to filter.
+ * @return The filtered image.
+ */
 QImage MainWindowController::applyGrayscaleFilter(const QImage& image)
 {
     GrayscaleAlgorithm algorithm;
     return algorithm.process(image);
 }
 
+/**
+ * @brief Applies the dramatic filter to an image.
+ * @param image The image to filter.
+ * @return The filtered image.
+ */
 QImage MainWindowController::applyDramaticFilter(const QImage& image)
 {
     DramaticAlgorithm algorithm;
     return algorithm.process(image);
 }
 
+/**
+ * @brief Applies the warm filter to an image.
+ * @param image The image to filter.
+ * @return The filtered image.
+ */
 QImage MainWindowController::applyWarmFilter(const QImage& image)
 {
     WarmAlgorithm algorithm;
     return algorithm.process(image);
 }
 
+/**
+ * @brief Generates a unique cache key for the image and filter type.
+ * @param image The image to generate the key for.
+ * @param filterType The type of filter.
+ * @return A unique QString key.
+ */
 QString MainWindowController::generateCacheKey(const QImage& image, FilterType filterType)
 {
     QByteArray imageData((const char*)image.bits(), image.sizeInBytes());

@@ -21,7 +21,8 @@ MainWindow::MainWindow(QWidget* parent)
     isCropMode(false),
     imageOffsetX(0),
     imageOffsetY(0),
-    scaledImageSize(QSize())
+    scaledImageSize(QSize()),
+    currentFilter(MainWindowController::NoFilter)
 {
     ui.setupUi(this);
 
@@ -52,6 +53,11 @@ MainWindow::MainWindow(QWidget* parent)
     filter3Label = ui.filter3Label;
     filter4Label = ui.filter4Label;
 
+    filterButtons[filter1Button] = MainWindowController::OilPainting;
+    filterButtons[filter2Button] = MainWindowController::Grayscale;
+    filterButtons[filter3Button] = MainWindowController::Dramatic;
+    filterButtons[filter4Button] = MainWindowController::Warm;
+
     imageProcessor = new ImageProcessor();
     channelVisibility = { {"red", false}, {"green", false}, {"blue", false} };
 
@@ -65,7 +71,6 @@ MainWindow::MainWindow(QWidget* parent)
     connect(ui.actionSave, &QAction::triggered, this, &MainWindow::saveImage);
     connect(controller, &MainWindowController::imagesFetched, this, &MainWindow::onImagesFetched);
     connect(controller, &MainWindowController::imageAdded, this, &MainWindow::onImageAdded);
-    connect(controller, &MainWindowController::imageUpdated, this, &MainWindow::onImageUpdated);
     connect(controller, &MainWindowController::imageDeleted, this, &MainWindow::onImageDeleted);
     connect(imageList, &QListWidget::itemClicked, this, &MainWindow::onImageSelected);
     connect(redRGBButton, &QPushButton::clicked, this, [this] { toggleHistogram("red"); });
@@ -77,6 +82,14 @@ MainWindow::MainWindow(QWidget* parent)
     connect(rotateLeftButton, &QPushButton::clicked, this, &MainWindow::rotateImageLeft);
     connect(flipButton, &QPushButton::clicked, this, &MainWindow::flipImage);
     connect(cropButton, &QPushButton::clicked, this, &MainWindow::cropImage);
+
+    connect(controller, &MainWindowController::filterApplied, this, &MainWindow::displayFilteredResult);
+
+    for (auto button : filterButtons.keys()) {
+        connect(button, &QPushButton::clicked, this, [=]() {
+            onFilterButtonClicked(filterButtons[button]);
+            });
+    }
 
     loadImages();
 }
@@ -259,23 +272,24 @@ void MainWindow::openFile()
             imageMeta.name = QFileInfo(fileName).fileName();
             imageMeta.path = fileName;
 
-            if (i == 0) {
+            QImage image(fileName);
+            if (!image.isNull()) {
+                imageMeta.width = image.width();
+                imageMeta.height = image.height();
+                imageMeta.pixelFormat = "RGBA";
 
-                QImage image(fileName);
-                if (!image.isNull()) {
-                    imageMeta.width = image.width();
-                    imageMeta.height = image.height();
-                    imageMeta.pixelFormat = "RGBA";
+                QByteArray imageData;
+                QBuffer buffer(&imageData);
+                if (buffer.open(QIODevice::WriteOnly)) {
+                    image.save(&buffer, "PNG");
+                    buffer.close();
+                }
+                imageMeta.imageData = imageData;
 
-                    QByteArray imageData;
-                    QBuffer buffer(&imageData);
-                    if (buffer.open(QIODevice::WriteOnly)) {
-                        image.save(&buffer, "PNG");
-                        buffer.close();
-                    }
-                    imageMeta.imageData = imageData;
-
+                if (i == 0) {
+                    originalImage = image;
                     currentImage = image;
+                    currentFilter = MainWindowController::NoFilter;
                     updateImageDisplay();
                     loadedImages.insert(imageMeta.path, image);
                 }
@@ -397,11 +411,6 @@ void MainWindow::onImageAdded(const Image& image)
     }
 }
 
-void MainWindow::onImageUpdated(int id)
-{
-    // Implement if needed
-}
-
 void MainWindow::onImageDeleted(int id)
 {
     auto it = std::find_if(images.begin(), images.end(), [id](const Image& img) {
@@ -445,7 +454,9 @@ void MainWindow::onImageSelected(QListWidgetItem* item)
     currentImagePath = selectedImage.path;
 
     if (loadedImages.contains(selectedImage.path)) {
-        currentImage = loadedImages[selectedImage.path];
+        originalImage = loadedImages[selectedImage.path];
+        currentImage = originalImage;
+        currentFilter = MainWindowController::NoFilter;
         updateImageDisplay();
     }
     else {
@@ -479,7 +490,9 @@ void MainWindow::onImageSelected(QListWidgetItem* item)
 
         if (!image.isNull()) {
             loadedImages.insert(selectedImage.path, image);
-            currentImage = image;
+            originalImage = image;
+            currentImage = originalImage;
+            currentFilter = MainWindowController::NoFilter;
             updateImageDisplay();
         }
     }
@@ -619,7 +632,8 @@ void MainWindow::drawAxes(QPainter& painter) {
     painter.drawLine(yAxisStartX, yAxisStartY, yAxisStartX + 5, yAxisStartY + 10);
 }
 
-void MainWindow::saveImage() {
+void MainWindow::saveImage()
+{
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Image"), "", tr("PNG Image (*.png);;JPEG Image (*.jpg)"));
     if (!fileName.isEmpty()) {
         if (!currentImage.save(fileName)) {
@@ -628,18 +642,24 @@ void MainWindow::saveImage() {
     }
 }
 
-void MainWindow::rotateImageRight() {
+void MainWindow::rotateImageRight()
+{
     currentImage = currentImage.transformed(QTransform().rotate(90));
+    originalImage = originalImage.transformed(QTransform().rotate(90));
     updateImageDisplay();
 }
 
-void MainWindow::rotateImageLeft() {
+void MainWindow::rotateImageLeft()
+{
     currentImage = currentImage.transformed(QTransform().rotate(-90));
+    originalImage = originalImage.transformed(QTransform().rotate(-90));
     updateImageDisplay();
 }
 
-void MainWindow::flipImage() {
+void MainWindow::flipImage()
+{
     currentImage = currentImage.mirrored(true, false);
+    originalImage = originalImage.mirrored(true, false);
     updateImageDisplay();
 }
 
@@ -683,6 +703,7 @@ void MainWindow::mouseReleaseEvent(QMouseEvent* event)
 
         if (!imageCropRect.isEmpty() && currentImage.rect().contains(imageCropRect)) {
             currentImage = currentImage.copy(imageCropRect);
+            originalImage = originalImage.copy(imageCropRect);
             updateImageDisplay();
         }
         cropRect = QRect();
@@ -694,5 +715,31 @@ void MainWindow::cropImage()
 {
     isCropMode = true;
     cropRect = QRect();
+}
+
+void MainWindow::onFilterButtonClicked(int filterType)
+{
+    if (currentImage.isNull()) {
+        QMessageBox::warning(this, "No Image", "Please load an image first.");
+        return;
+    }
+
+    if (currentFilter == filterType) {
+        currentImage = originalImage;
+        currentFilter = MainWindowController::NoFilter;
+        updateImageDisplay();
+    }
+    else {
+        currentFilter = static_cast<MainWindowController::FilterType>(filterType);
+        controller->applyFilter(originalImage, currentFilter);
+    }
+}
+
+void MainWindow::displayFilteredResult(const QImage& filteredImage, MainWindowController::FilterType filterType)
+{
+    if (currentFilter == filterType) {
+        currentImage = filteredImage;
+        updateImageDisplay();
+    }
 }
 

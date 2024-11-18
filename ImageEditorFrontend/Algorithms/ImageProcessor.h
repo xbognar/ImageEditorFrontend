@@ -1,3 +1,4 @@
+
 #ifndef IMAGEPROCESSOR_H
 #define IMAGEPROCESSOR_H
 
@@ -14,4 +15,4 @@ private:
     static QVector<int> calculateChannelHistogram(const QImage& image, int channelIndex);
 };
 
-#endif // IMAGEPROCESSOR_H
+#endif

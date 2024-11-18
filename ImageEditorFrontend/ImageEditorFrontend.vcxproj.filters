@@ -23,7 +23,7 @@
       <UniqueIdentifier>{0258791b-c57a-4e0d-a18a-5e43c9235554}</UniqueIdentifier>
     </Filter>
     <Filter Include="Algorithms">
-      <UniqueIdentifier>{539415d1-1a02-4bc2-8042-60fcf1552956}</UniqueIdentifier>
+      <UniqueIdentifier>{ec641dc9-67f1-4be5-abd7-e3a81edb4388}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -43,7 +43,19 @@
       <Filter>Views</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Algorithms\DramaticAlgorithm.cpp">
+      <Filter>Algorithms</Filter>
+    </ClCompile>
+    <ClCompile Include="Algorithms\GrayscaleAlgorithm.cpp">
+      <Filter>Algorithms</Filter>
+    </ClCompile>
     <ClCompile Include="Algorithms\ImageProcessor.cpp">
+      <Filter>Algorithms</Filter>
+    </ClCompile>
+    <ClCompile Include="Algorithms\OilPaintingAlgorithm.cpp">
+      <Filter>Algorithms</Filter>
+    </ClCompile>
+    <ClCompile Include="Algorithms\WarmAlgorithm.cpp">
       <Filter>Algorithms</Filter>
     </ClCompile>
   </ItemGroup>
@@ -65,7 +77,19 @@
     <ClInclude Include="Models\Image.h">
       <Filter>Models</Filter>
     </ClInclude>
+    <ClInclude Include="Algorithms\DramaticAlgorithm.h">
+      <Filter>Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="Algorithms\GrayscaleAlgorithm.h">
+      <Filter>Algorithms</Filter>
+    </ClInclude>
     <ClInclude Include="Algorithms\ImageProcessor.h">
+      <Filter>Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="Algorithms\OilPaintingAlgorithm.h">
+      <Filter>Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="Algorithms\WarmAlgorithm.h">
       <Filter>Algorithms</Filter>
     </ClInclude>
   </ItemGroup>

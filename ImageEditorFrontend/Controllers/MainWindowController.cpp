@@ -1,11 +1,18 @@
 #include "MainWindowController.h"
-#include <QtConcurrent>
-#include <QFuture>
+#include "../Algorithms/OilPaintingAlgorithm.h"
+#include "../Algorithms/GrayscaleAlgorithm.h"
+#include "../Algorithms/DramaticAlgorithm.h"
+#include "../Algorithms/WarmAlgorithm.h"
+#include <QtConcurrent/QtConcurrent>
 #include <QFutureWatcher>
+#include <QCryptographicHash>
 #include <QDebug>
 
 MainWindowController::MainWindowController(ImageService* service, QObject* parent)
-    : QObject(parent), imageService(service) {}
+    : QObject(parent), imageService(service)
+{
+    filterCache.clear();
+}
 
 void MainWindowController::fetchImagesAsync() {
     
@@ -103,3 +110,72 @@ void MainWindowController::calculateHistogramAsync(const QImage& image, const QS
     watcher->setFuture(future);
 }
 
+void MainWindowController::applyFilter(const QImage& image, FilterType filterType)
+{
+    QString cacheKey = generateCacheKey(image, filterType);
+
+    if (filterCache.contains(cacheKey)) {
+        emit filterApplied(filterCache[cacheKey], filterType);
+        return;
+    }
+
+    QFuture<QImage> future;
+    switch (filterType) {
+    case OilPainting:
+        future = QtConcurrent::run([=]() { return applyOilPaintingFilter(image); });
+        break;
+    case Grayscale:
+        future = QtConcurrent::run([=]() { return applyGrayscaleFilter(image); });
+        break;
+    case Dramatic:
+        future = QtConcurrent::run([=]() { return applyDramaticFilter(image); });
+        break;
+    case Warm:
+        future = QtConcurrent::run([=]() { return applyWarmFilter(image); });
+        break;
+    default:
+        qDebug() << "Unknown filter type";
+        return;
+    }
+
+    QFutureWatcher<QImage>* watcher = new QFutureWatcher<QImage>(this);
+    connect(watcher, &QFutureWatcher<QImage>::finished, this, [=]() {
+        QImage result = watcher->result();
+        filterCache[cacheKey] = result;
+        emit filterApplied(result, filterType);
+        watcher->deleteLater();
+        });
+
+    watcher->setFuture(future);
+}
+
+QImage MainWindowController::applyOilPaintingFilter(const QImage& image)
+{
+    OilPaintingAlgorithm algorithm;
+    return algorithm.process(image);
+}
+
+QImage MainWindowController::applyGrayscaleFilter(const QImage& image)
+{
+    GrayscaleAlgorithm algorithm;
+    return algorithm.process(image);
+}
+
+QImage MainWindowController::applyDramaticFilter(const QImage& image)
+{
+    DramaticAlgorithm algorithm;
+    return algorithm.process(image);
+}
+
+QImage MainWindowController::applyWarmFilter(const QImage& image)
+{
+    WarmAlgorithm algorithm;
+    return algorithm.process(image);
+}
+
+QString MainWindowController::generateCacheKey(const QImage& image, FilterType filterType)
+{
+    QByteArray imageData((const char*)image.bits(), image.sizeInBytes());
+    QByteArray hashData = QCryptographicHash::hash(imageData, QCryptographicHash::Md5);
+    return hashData.toHex() + "_" + QString::number(filterType);
+}

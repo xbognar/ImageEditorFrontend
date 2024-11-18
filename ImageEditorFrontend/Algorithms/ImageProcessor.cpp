@@ -1,3 +1,4 @@
+
 #include "ImageProcessor.h"
 #include <QColor>
 

@@ -10,6 +10,7 @@
 #include <QSet>
 #include <QMouseEvent>
 #include <QRect>
+#include <QImage>
 #include "ui_MainWindow.h"
 #include "../Services/ImageService.h"
 #include "../Controllers/MainWindowController.h"
@@ -20,10 +21,12 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
+    
     MainWindow(QWidget* parent = nullptr);
     ~MainWindow();
 
 protected:
+    
     void resizeEvent(QResizeEvent* event) override;
     void paintEvent(QPaintEvent* event) override;
     void mousePressEvent(QMouseEvent* event) override;
@@ -31,6 +34,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent* event) override;
 
 private:
+    
     Ui::MainWindowClass ui;
 
     QLabel* imageViewer;
@@ -76,6 +80,9 @@ private:
     int imageOffsetX;
     int imageOffsetY;
     QSize scaledImageSize;
+    QImage originalImage;
+    MainWindowController::FilterType currentFilter;
+    QMap<QPushButton*, MainWindowController::FilterType> filterButtons;
 
     void applyStylesheet();
     void setupHistogram();
@@ -93,12 +100,12 @@ private:
     QPixmap scaleImageToViewer(const QImage& image);
 
 private slots:
+
     void openFile();
     void loadImages();
     void exitApp();
     void onImagesFetched(const QList<Image>& images);
     void onImageAdded(const Image& image);
-    void onImageUpdated(int id);
     void onImageDeleted(int id);
     void onImageSelected(QListWidgetItem* item);
     void onHistogramCalculated(const QString& imageIdentifier, const QString& channel, const QVector<int>& histogram);
@@ -107,4 +114,8 @@ private slots:
     void flipImage();
     void cropImage();
     void saveImage();
+    void onFilterButtonClicked(int filterType);
+    void displayFilteredResult(const QImage& filteredImage, MainWindowController::FilterType filterType);
+
 };
+

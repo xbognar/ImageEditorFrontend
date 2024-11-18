@@ -9,11 +9,19 @@
 #include <QPainterPath>
 #include <QResizeEvent>
 #include <QBuffer>
+#include <QInputDialog>
 #include <algorithm>
 
 MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent), firstResizeEvent(true), imageService(new ImageService(this)),
-    controller(new MainWindowController(imageService, this))
+    : QMainWindow(parent),
+    firstResizeEvent(true),
+    imageService(new ImageService(this)),
+    controller(new MainWindowController(imageService, this)),
+    isCropping(false),
+    isCropMode(false),
+    imageOffsetX(0),
+    imageOffsetY(0),
+    scaledImageSize(QSize())
 {
     ui.setupUi(this);
 
@@ -54,6 +62,7 @@ MainWindow::MainWindow(QWidget* parent)
     connect(deleteButton, &QPushButton::clicked, this, &MainWindow::deleteSelectedImage);
     connect(ui.actionExit, &QAction::triggered, this, &MainWindow::exitApp);
     connect(ui.actionOpen, &QAction::triggered, this, &MainWindow::openFile);
+    connect(ui.actionSave, &QAction::triggered, this, &MainWindow::saveImage);
     connect(controller, &MainWindowController::imagesFetched, this, &MainWindow::onImagesFetched);
     connect(controller, &MainWindowController::imageAdded, this, &MainWindow::onImageAdded);
     connect(controller, &MainWindowController::imageUpdated, this, &MainWindow::onImageUpdated);
@@ -63,6 +72,11 @@ MainWindow::MainWindow(QWidget* parent)
     connect(greenRGBButton, &QPushButton::clicked, this, [this] { toggleHistogram("green"); });
     connect(blueRGBButton, &QPushButton::clicked, this, [this] { toggleHistogram("blue"); });
     connect(controller, &MainWindowController::histogramCalculated, this, &MainWindow::onHistogramCalculated);
+
+    connect(rotateRightButton, &QPushButton::clicked, this, &MainWindow::rotateImageRight);
+    connect(rotateLeftButton, &QPushButton::clicked, this, &MainWindow::rotateImageLeft);
+    connect(flipButton, &QPushButton::clicked, this, &MainWindow::flipImage);
+    connect(cropButton, &QPushButton::clicked, this, &MainWindow::cropImage);
 
     loadImages();
 }
@@ -494,7 +508,23 @@ void MainWindow::updateImageDisplay()
     QSize viewerSize = imageViewer->size();
 
     QPixmap scaledPixmap = pixmap.scaled(viewerSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    imageViewer->setPixmap(scaledPixmap);
+    scaledImageSize = scaledPixmap.size();
+
+    imageOffsetX = (imageViewer->width() - scaledPixmap.width()) / 2;
+    imageOffsetY = (imageViewer->height() - scaledPixmap.height()) / 2;
+
+    QPixmap displayPixmap = QPixmap(imageViewer->size());
+    displayPixmap.fill(Qt::transparent);
+
+    QPainter painter(&displayPixmap);
+    painter.drawPixmap(imageOffsetX, imageOffsetY, scaledPixmap);
+
+    if (isCropping && isCropMode) {
+        painter.setPen(QPen(Qt::DashLine));
+        painter.drawRect(cropRect);
+    }
+
+    imageViewer->setPixmap(displayPixmap);
 }
 
 void MainWindow::toggleHistogram(const QString& channel) {
@@ -588,3 +618,81 @@ void MainWindow::drawAxes(QPainter& painter) {
     painter.drawLine(yAxisStartX, yAxisStartY, yAxisStartX - 5, yAxisStartY + 10);
     painter.drawLine(yAxisStartX, yAxisStartY, yAxisStartX + 5, yAxisStartY + 10);
 }
+
+void MainWindow::saveImage() {
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Image"), "", tr("PNG Image (*.png);;JPEG Image (*.jpg)"));
+    if (!fileName.isEmpty()) {
+        if (!currentImage.save(fileName)) {
+            QMessageBox::warning(this, tr("Save Error"), tr("Failed to save the image."));
+        }
+    }
+}
+
+void MainWindow::rotateImageRight() {
+    currentImage = currentImage.transformed(QTransform().rotate(90));
+    updateImageDisplay();
+}
+
+void MainWindow::rotateImageLeft() {
+    currentImage = currentImage.transformed(QTransform().rotate(-90));
+    updateImageDisplay();
+}
+
+void MainWindow::flipImage() {
+    currentImage = currentImage.mirrored(true, false);
+    updateImageDisplay();
+}
+
+void MainWindow::mousePressEvent(QMouseEvent* event)
+{
+    if (event->button() == Qt::LeftButton && isCropMode) {
+        QPoint imageViewerPos = imageViewer->mapFrom(this, event->pos());
+        if (imageViewer->rect().contains(imageViewerPos)) {
+            isCropping = true;
+            cropStartPoint = imageViewerPos;
+            cropRect = QRect(cropStartPoint, cropStartPoint);
+        }
+    }
+}
+
+void MainWindow::mouseMoveEvent(QMouseEvent* event)
+{
+    if (isCropping && isCropMode) {
+        QPoint imageViewerPos = imageViewer->mapFrom(this, event->pos());
+        cropRect = QRect(cropStartPoint, imageViewerPos).normalized();
+        updateImageDisplay();
+    }
+}
+
+void MainWindow::mouseReleaseEvent(QMouseEvent* event)
+{
+    if (event->button() == Qt::LeftButton && isCropping && isCropMode) {
+        isCropping = false;
+
+        QRect adjustedRect = cropRect.translated(-imageOffsetX, -imageOffsetY);
+
+        float scaleX = static_cast<float>(currentImage.width()) / scaledImageSize.width();
+        float scaleY = static_cast<float>(currentImage.height()) / scaledImageSize.height();
+
+        QRect imageCropRect = QRect(
+            adjustedRect.left() * scaleX,
+            adjustedRect.top() * scaleY,
+            adjustedRect.width() * scaleX,
+            adjustedRect.height() * scaleY
+        ).normalized();
+
+        if (!imageCropRect.isEmpty() && currentImage.rect().contains(imageCropRect)) {
+            currentImage = currentImage.copy(imageCropRect);
+            updateImageDisplay();
+        }
+        cropRect = QRect();
+        isCropMode = false;
+    }
+}
+
+void MainWindow::cropImage()
+{
+    isCropMode = true;
+    cropRect = QRect();
+}
+

@@ -8,6 +8,8 @@
 #include <QList>
 #include <QMap>
 #include <QSet>
+#include <QMouseEvent>
+#include <QRect>
 #include "ui_MainWindow.h"
 #include "../Services/ImageService.h"
 #include "../Controllers/MainWindowController.h"
@@ -18,17 +20,17 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-
     MainWindow(QWidget* parent = nullptr);
     ~MainWindow();
 
 protected:
-
     void resizeEvent(QResizeEvent* event) override;
     void paintEvent(QPaintEvent* event) override;
+    void mousePressEvent(QMouseEvent* event) override;
+    void mouseMoveEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
 
 private:
-
     Ui::MainWindowClass ui;
 
     QLabel* imageViewer;
@@ -67,6 +69,14 @@ private:
 
     QMap<QString, QMap<QString, QVector<int>>> histogramCache;
 
+    QRect cropRect;
+    QPoint cropStartPoint;
+    bool isCropping;
+    bool isCropMode;
+    int imageOffsetX;
+    int imageOffsetY;
+    QSize scaledImageSize;
+
     void applyStylesheet();
     void setupHistogram();
     void displayImages(const QList<Image>& images);
@@ -83,7 +93,6 @@ private:
     QPixmap scaleImageToViewer(const QImage& image);
 
 private slots:
-
     void openFile();
     void loadImages();
     void exitApp();
@@ -93,5 +102,9 @@ private slots:
     void onImageDeleted(int id);
     void onImageSelected(QListWidgetItem* item);
     void onHistogramCalculated(const QString& imageIdentifier, const QString& channel, const QVector<int>& histogram);
-
+    void rotateImageRight();
+    void rotateImageLeft();
+    void flipImage();
+    void cropImage();
+    void saveImage();
 };

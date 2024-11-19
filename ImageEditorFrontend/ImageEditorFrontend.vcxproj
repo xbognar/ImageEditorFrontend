@@ -50,6 +50,16 @@
     <Image Include="Resources\Icons\SmilingWomanGrayscale.jpg" />
     <Image Include="Resources\Icons\SmilingWomanOil.jpg" />
     <Image Include="Resources\Icons\SmilingWomanWarm.jpg" />
+    <Image Include="Resources\TestImages\BirthOfVenus.jpg" />
+    <Image Include="Resources\TestImages\CaffeTerraceAtNight.jpg" />
+    <Image Include="Resources\TestImages\CreationOfAdam.jpg" />
+    <Image Include="Resources\TestImages\LastSupper.jpg" />
+    <Image Include="Resources\TestImages\LibertyLeadingThePeople.jpg" />
+    <Image Include="Resources\TestImages\MonaLisa.jpg" />
+    <Image Include="Resources\TestImages\PresistenceOfWaiting.jpg" />
+    <Image Include="Resources\TestImages\RichardSJohnson.jpg" />
+    <Image Include="Resources\TestImages\StarryNight.jpg" />
+    <Image Include="Resources\TestImages\TheGirl.jpg" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Styles\Styles.qss" />

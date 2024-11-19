@@ -25,6 +25,9 @@
     <Filter Include="Algorithms">
       <UniqueIdentifier>{ec641dc9-67f1-4be5-abd7-e3a81edb4388}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resources\TestImages">
+      <UniqueIdentifier>{7be2cc94-e9a5-4603-83c0-a16649ed991e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Controllers\MainWindowController.cpp">
@@ -129,6 +132,36 @@
     </Image>
     <Image Include="Resources\Icons\SmilingWomanWarm.jpg">
       <Filter>Resources\Icons</Filter>
+    </Image>
+    <Image Include="Resources\TestImages\BirthOfVenus.jpg">
+      <Filter>Resources\TestImages</Filter>
+    </Image>
+    <Image Include="Resources\TestImages\CaffeTerraceAtNight.jpg">
+      <Filter>Resources\TestImages</Filter>
+    </Image>
+    <Image Include="Resources\TestImages\CreationOfAdam.jpg">
+      <Filter>Resources\TestImages</Filter>
+    </Image>
+    <Image Include="Resources\TestImages\LastSupper.jpg">
+      <Filter>Resources\TestImages</Filter>
+    </Image>
+    <Image Include="Resources\TestImages\LibertyLeadingThePeople.jpg">
+      <Filter>Resources\TestImages</Filter>
+    </Image>
+    <Image Include="Resources\TestImages\MonaLisa.jpg">
+      <Filter>Resources\TestImages</Filter>
+    </Image>
+    <Image Include="Resources\TestImages\PresistenceOfWaiting.jpg">
+      <Filter>Resources\TestImages</Filter>
+    </Image>
+    <Image Include="Resources\TestImages\RichardSJohnson.jpg">
+      <Filter>Resources\TestImages</Filter>
+    </Image>
+    <Image Include="Resources\TestImages\StarryNight.jpg">
+      <Filter>Resources\TestImages</Filter>
+    </Image>
+    <Image Include="Resources\TestImages\TheGirl.jpg">
+      <Filter>Resources\TestImages</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>

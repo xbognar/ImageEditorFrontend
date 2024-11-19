@@ -40,12 +40,16 @@
   <ItemGroup>
     <Image Include="Resources\Icons\crop.png" />
     <Image Include="Resources\Icons\delete.png" />
-    <Image Include="Resources\Icons\filterWoman.jpg" />
     <Image Include="Resources\Icons\flip.png" />
     <Image Include="Resources\Icons\folder.png" />
     <Image Include="Resources\Icons\rgb.png" />
     <Image Include="Resources\Icons\rotate-left.png" />
     <Image Include="Resources\Icons\rotate-right.png" />
+    <Image Include="Resources\Icons\SmilingWoman.jpg" />
+    <Image Include="Resources\Icons\SmilingWomanDramatic.jpg" />
+    <Image Include="Resources\Icons\SmilingWomanGrayscale.jpg" />
+    <Image Include="Resources\Icons\SmilingWomanOil.jpg" />
+    <Image Include="Resources\Icons\SmilingWomanWarm.jpg" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Styles\Styles.qss" />

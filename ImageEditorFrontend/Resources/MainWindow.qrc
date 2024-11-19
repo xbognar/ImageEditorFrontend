@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/MainWindow">
         <file>Icons/crop.png</file>
-        <file>Icons/filterWoman.jpg</file>
         <file>Icons/flip.png</file>
         <file>Icons/folder.png</file>
         <file>Icons/rgb.png</file>
@@ -9,5 +8,10 @@
         <file>Icons/rotate-right.png</file>
         <file>Styles/Styles.qss</file>
         <file>Icons/delete.png</file>
+        <file>Icons/SmilingWoman.jpg</file>
+        <file>Icons/SmilingWomanDramatic.jpg</file>
+        <file>Icons/SmilingWomanGrayscale.jpg</file>
+        <file>Icons/SmilingWomanOil.jpg</file>
+        <file>Icons/SmilingWomanWarm.jpg</file>
     </qresource>
 </RCC>

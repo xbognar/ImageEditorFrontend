@@ -141,20 +141,20 @@
      </rect>
     </property>
     <property name="text">
-     <string>Filter 1</string>
+     <string>OilPaint</string>
     </property>
    </widget>
    <widget class="QLabel" name="filter2Label">
     <property name="geometry">
      <rect>
-      <x>1137</x>
+      <x>1133</x>
       <y>202</y>
-      <width>41</width>
+      <width>51</width>
       <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>Filter 2</string>
+     <string>Grayscale</string>
     </property>
    </widget>
    <widget class="QPushButton" name="filter2Button">
@@ -173,14 +173,14 @@
    <widget class="QLabel" name="filter3Label">
     <property name="geometry">
      <rect>
-      <x>1137</x>
+      <x>1133</x>
       <y>282</y>
-      <width>41</width>
+      <width>51</width>
       <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>Filter 3</string>
+     <string>Dramatic</string>
     </property>
    </widget>
    <widget class="QPushButton" name="filter3Button">
@@ -199,14 +199,14 @@
    <widget class="QLabel" name="filter4Label">
     <property name="geometry">
      <rect>
-      <x>1137</x>
+      <x>1142</x>
       <y>362</y>
       <width>41</width>
       <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>Filter 4</string>
+     <string>Warm</string>
     </property>
    </widget>
    <widget class="QPushButton" name="filter4Button">

@@ -51,7 +51,7 @@ QPushButton#filter2Button,
 QPushButton#filter3Button,
 QPushButton#filter4Button {
     width: 64px;
-    height: 64px;
+    height: 70px;
     qproperty-iconSize: 50px 60px; 
     background-color: #f5f5dc;    
     border: none;
@@ -59,16 +59,16 @@ QPushButton#filter4Button {
 }
 
 QPushButton#filter1Button {
-    qproperty-icon: url(:/MainWindow/Icons/filterWoman.jpg);
+    qproperty-icon: url(:/MainWindow/Icons/SmilingWomanOil.jpg);
 }
 QPushButton#filter2Button {
-    qproperty-icon: url(:/MainWindow/Icons/filterWoman.jpg);
+    qproperty-icon: url(:/MainWindow/Icons/SmilingWomanGrayscale.jpg);
 }
 QPushButton#filter3Button {
-    qproperty-icon: url(:/MainWindow/Icons/filterWoman.jpg);
+    qproperty-icon: url(:/MainWindow/Icons/SmilingWomanDramatic.jpg);
 }
 QPushButton#filter4Button {
-    qproperty-icon: url(:/MainWindow/Icons/filterWoman.jpg);
+    qproperty-icon: url(:/MainWindow/Icons/SmilingWomanWarm.jpg);
 }
 
 QPushButton#redRGBButton,

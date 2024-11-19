@@ -97,9 +97,6 @@
     <Image Include="Resources\Icons\crop.png">
       <Filter>Resources\Icons</Filter>
     </Image>
-    <Image Include="Resources\Icons\filterWoman.jpg">
-      <Filter>Resources\Icons</Filter>
-    </Image>
     <Image Include="Resources\Icons\flip.png">
       <Filter>Resources\Icons</Filter>
     </Image>
@@ -116,6 +113,21 @@
       <Filter>Resources\Icons</Filter>
     </Image>
     <Image Include="Resources\Icons\delete.png">
+      <Filter>Resources\Icons</Filter>
+    </Image>
+    <Image Include="Resources\Icons\SmilingWoman.jpg">
+      <Filter>Resources\Icons</Filter>
+    </Image>
+    <Image Include="Resources\Icons\SmilingWomanDramatic.jpg">
+      <Filter>Resources\Icons</Filter>
+    </Image>
+    <Image Include="Resources\Icons\SmilingWomanGrayscale.jpg">
+      <Filter>Resources\Icons</Filter>
+    </Image>
+    <Image Include="Resources\Icons\SmilingWomanOil.jpg">
+      <Filter>Resources\Icons</Filter>
+    </Image>
+    <Image Include="Resources\Icons\SmilingWomanWarm.jpg">
       <Filter>Resources\Icons</Filter>
     </Image>
   </ItemGroup>

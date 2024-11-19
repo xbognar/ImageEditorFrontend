@@ -15,7 +15,7 @@ The Image Editor Frontend is a Qt-based C++ application that provides essential 
 
 ## Screenshots
 
-*(Add screenshots here to showcase the UI)*
+![Screenshot of the UI](https://github.com/xbognar/ImageEditorFrontend/blob/master/ImageEditorFrontend/Resources/Icons/AppScreenshot.png)
 
 ## Features
 

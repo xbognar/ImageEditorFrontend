@@ -38,6 +38,7 @@
     <QtMoc Include="Services\BaseService.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Resources\Icons\AppScreenshot.png" />
     <Image Include="Resources\Icons\crop.png" />
     <Image Include="Resources\Icons\delete.png" />
     <Image Include="Resources\Icons\flip.png" />

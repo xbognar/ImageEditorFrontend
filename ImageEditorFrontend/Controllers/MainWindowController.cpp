@@ -9,8 +9,8 @@
 #include <QDebug>
 
 /**
- * @brief Constructs the MainWindowController object.
- * @param service The ImageService instance for image operations.
+ * @brief Constructs the MainWindowController object, responsible for managing image operations.
+ * @param service The ImageService instance for handling image operations.
  * @param parent The parent QObject.
  */
 MainWindowController::MainWindowController(ImageService* service, QObject* parent)
@@ -20,7 +20,7 @@ MainWindowController::MainWindowController(ImageService* service, QObject* paren
 }
 
 /**
- * @brief Fetches images asynchronously from the image service.
+ * @brief Fetches images in a separate thread from the image service.
  */
 void MainWindowController::fetchImagesAsync()
 {
@@ -39,7 +39,7 @@ void MainWindowController::fetchImagesAsync()
 }
 
 /**
- * @brief Adds an image asynchronously to the image service.
+ * @brief Adds an image in a separate thread to the image service.
  * @param image The image to add.
  */
 void MainWindowController::addImageAsync(const Image& image)
@@ -59,7 +59,7 @@ void MainWindowController::addImageAsync(const Image& image)
 }
 
 /**
- * @brief Updates an image asynchronously in the image service.
+ * @brief Updates an image in a separate thread in the image service.
  * @param id The ID of the image to update.
  * @param image The updated image data.
  */
@@ -79,7 +79,7 @@ void MainWindowController::updateImageAsync(int id, const Image& image)
 }
 
 /**
- * @brief Deletes an image asynchronously from the image service.
+ * @brief Deletes an image in a separate thread from the image service.
  * @param id The ID of the image to delete.
  */
 void MainWindowController::deleteImageAsync(int id)
@@ -98,7 +98,7 @@ void MainWindowController::deleteImageAsync(int id)
 }
 
 /**
- * @brief Calculates the histogram of an image asynchronously.
+ * @brief Calculates the histogram of an image in a separate thread.
  * @param image The image to process.
  * @param channel The color channel ("red", "green", "blue").
  * @param imageIdentifier A unique identifier for the image.
@@ -136,7 +136,7 @@ void MainWindowController::calculateHistogramAsync(const QImage& image, const QS
 }
 
 /**
- * @brief Applies a filter to an image asynchronously.
+ * @brief Applies a filter to an image in a separate thread.
  * @param image The image to filter.
  * @param filterType The type of filter to apply.
  */
@@ -224,7 +224,7 @@ QImage MainWindowController::applyWarmFilter(const QImage& image)
 }
 
 /**
- * @brief Generates a unique cache key for the image and filter type.
+ * @brief Generates a unique cache key based on the image data and filter type.
  * @param image The image to generate the key for.
  * @param filterType The type of filter.
  * @return A unique QString key.

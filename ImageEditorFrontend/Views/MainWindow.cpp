@@ -12,6 +12,10 @@
 #include <QInputDialog>
 #include <algorithm>
 
+
+
+//*********************** Constructor & Destructor ***********************//
+
 /**
  * @brief Constructs the MainWindow object and initializes the UI components.
  * @param parent The parent widget, if any.
@@ -81,14 +85,11 @@ MainWindow::MainWindow(QWidget* parent)
     connect(greenRGBButton, &QPushButton::clicked, this, [this] { toggleHistogram("green"); });
     connect(blueRGBButton, &QPushButton::clicked, this, [this] { toggleHistogram("blue"); });
     connect(controller, &MainWindowController::histogramCalculated, this, &MainWindow::onHistogramCalculated);
-
     connect(rotateRightButton, &QPushButton::clicked, this, &MainWindow::rotateImageRight);
     connect(rotateLeftButton, &QPushButton::clicked, this, &MainWindow::rotateImageLeft);
     connect(flipButton, &QPushButton::clicked, this, &MainWindow::flipImage);
     connect(cropButton, &QPushButton::clicked, this, &MainWindow::cropImage);
-
     connect(controller, &MainWindowController::filterApplied, this, &MainWindow::displayFilteredResult);
-
     for (auto button : filterButtons.keys()) {
         connect(button, &QPushButton::clicked, this, [=]() {
             onFilterButtonClicked(filterButtons[button]);
@@ -107,6 +108,11 @@ MainWindow::~MainWindow()
     delete imageService;
     delete controller;
 }
+
+
+
+
+//*********************** Setup & Initialization ***********************//
 
 /**
  * @brief Applies the stylesheet to the application.
@@ -163,6 +169,11 @@ void MainWindow::setupHistogram()
 
     histogramViewer->setPixmap(QPixmap::fromImage(*histogramImage));
 }
+
+
+
+
+//**************************** Event Handlers ****************************//
 
 /**
  * @brief Handles the resize event to adjust UI components accordingly.
@@ -252,35 +263,69 @@ void MainWindow::paintEvent(QPaintEvent* event)
 }
 
 /**
- * @brief Draws custom columns and circles on the UI for aesthetic purposes.
- * @param painter The QPainter object used for drawing.
+ * @brief Handles the mouse press event for cropping functionality.
+ * @param event The mouse event.
  */
-void MainWindow::drawColumnsAndCircles(QPainter& painter)
+void MainWindow::mousePressEvent(QMouseEvent* event)
 {
-    painter.setRenderHint(QPainter::Antialiasing);
-    painter.setPen(Qt::NoPen);
-    painter.setBrush(QBrush(QColor("#f5f5dc")));
-
-    int leftColumnWidth = 55;
-    int leftColumnX = folderButton->x() - 8;
-    int leftColumnY = 45;
-    int leftColumnHeight = flipButton->geometry().bottom() - leftColumnY + 10;
-
-    painter.drawRoundedRect(leftColumnX, leftColumnY, leftColumnWidth, leftColumnHeight + 20, 0, 0);
-
-    int circleDiameter = leftColumnWidth;
-    int circleX = leftColumnX;
-    int circleY = leftColumnY + leftColumnHeight - 10;
-
-    painter.drawEllipse(circleX, circleY, circleDiameter, circleDiameter);
-
-    int rightColumnWidth = 63;
-    int rightColumnX = this->width() - rightColumnWidth - 10;
-    int rightColumnY = filter1Button->y();
-    int rightColumnHeight = this->height() - rightColumnY + 50;
-
-    painter.drawRoundedRect(rightColumnX, rightColumnY, rightColumnWidth, rightColumnHeight, 30, 35);
+    if (event->button() == Qt::LeftButton && isCropMode) {
+        QPoint imageViewerPos = imageViewer->mapFrom(this, event->pos());
+        if (imageViewer->rect().contains(imageViewerPos)) {
+            isCropping = true;
+            cropStartPoint = imageViewerPos;
+            cropRect = QRect(cropStartPoint, cropStartPoint);
+        }
+    }
 }
+
+/**
+ * @brief Handles the mouse move event for cropping functionality.
+ * @param event The mouse event.
+ */
+void MainWindow::mouseMoveEvent(QMouseEvent* event)
+{
+    if (isCropping && isCropMode) {
+        QPoint imageViewerPos = imageViewer->mapFrom(this, event->pos());
+        cropRect = QRect(cropStartPoint, imageViewerPos).normalized();
+        updateImageDisplay();
+    }
+}
+
+/**
+ * @brief Handles the mouse release event for cropping functionality.
+ * @param event The mouse event.
+ */
+void MainWindow::mouseReleaseEvent(QMouseEvent* event)
+{
+    if (event->button() == Qt::LeftButton && isCropping && isCropMode) {
+        isCropping = false;
+
+        QRect adjustedRect = cropRect.translated(-imageOffsetX, -imageOffsetY);
+
+        float scaleX = static_cast<float>(currentImage.width()) / scaledImageSize.width();
+        float scaleY = static_cast<float>(currentImage.height()) / scaledImageSize.height();
+
+        QRect imageCropRect = QRect(
+            adjustedRect.left() * scaleX,
+            adjustedRect.top() * scaleY,
+            adjustedRect.width() * scaleX,
+            adjustedRect.height() * scaleY
+        ).normalized();
+
+        if (!imageCropRect.isEmpty() && currentImage.rect().contains(imageCropRect)) {
+            currentImage = currentImage.copy(imageCropRect);
+            originalImage = originalImage.copy(imageCropRect);
+            updateImageDisplay();
+        }
+        cropRect = QRect();
+        isCropMode = false;
+    }
+}
+
+
+
+
+//***************************** UI Actions ********************************//
 
 /**
  * @brief Opens a file dialog to select images and loads them into the application.
@@ -335,52 +380,6 @@ void MainWindow::openFile()
 }
 
 /**
- * @brief Adds an image to the image list widget.
- * @param image The image metadata to add.
- */
-void MainWindow::addImageToList(const Image& image)
-{
-    QIcon icon;
-
-    if (!image.imageData.isEmpty()) {
-        QImage img = QImage::fromData(image.imageData).scaled(50, 50, Qt::KeepAspectRatio);
-        icon = QIcon(QPixmap::fromImage(img));
-    }
-    else {
-        icon = QIcon(":/MainWindow/Icons/placeholder.png");
-    }
-
-    QListWidgetItem* item = new QListWidgetItem(icon, QString("%1 | %2 | %3x%4")
-        .arg(image.id).arg(image.name).arg(image.width).arg(image.height));
-    item->setData(Qt::UserRole, QVariant::fromValue(image));
-    imageList->addItem(item);
-}
-
-/**
- * @brief Checks if an image is already in the image list.
- * @param path The file path of the image.
- * @return True if the image is in the list, false otherwise.
- */
-bool MainWindow::isImageInList(const QString& path)
-{
-    return std::any_of(images.begin(), images.end(), [&path](const Image& img) {
-        return img.path == path;
-        });
-}
-
-/**
- * @brief Scales the given image to fit the image viewer.
- * @param image The image to scale.
- * @return The scaled QPixmap.
- */
-QPixmap MainWindow::scaleImageToViewer(const QImage& image)
-{
-    QSize viewerSize = imageViewer->size();
-    QPixmap pixmap = QPixmap::fromImage(image);
-    return pixmap.scaled(viewerSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-}
-
-/**
  * @brief Deletes the currently selected image from the application.
  */
 void MainWindow::deleteSelectedImage()
@@ -405,43 +404,69 @@ void MainWindow::deleteSelectedImage()
 }
 
 /**
- * @brief Loads images from the image service asynchronously.
- */
-void MainWindow::loadImages()
-{
-    controller->fetchImagesAsync();
-}
-
-/**
- * @brief Displays the list of images in the image list widget.
- * @param images The list of images to display.
- */
-void MainWindow::displayImages(const QList<Image>& images)
-{
-    imageList->clear();
-    for (const Image& img : images) {
-        addImageToList(img);
-    }
-}
-
-/**
- * @brief Loads the first image in the image list and displays it.
- */
-void MainWindow::loadFirstImage()
-{
-    if (!images.isEmpty()) {
-        QListWidgetItem* firstItem = imageList->item(0);
-        onImageSelected(firstItem);
-    }
-}
-
-/**
  * @brief Exits the application.
  */
 void MainWindow::exitApp()
 {
     QApplication::quit();
 }
+
+/**
+ * @brief Saves the current image to a file.
+ */
+void MainWindow::saveImage()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Image"), "", tr("PNG Image (*.png);;JPEG Image (*.jpg)"));
+    if (!fileName.isEmpty()) {
+        if (!currentImage.save(fileName)) {
+            QMessageBox::warning(this, tr("Save Error"), tr("Failed to save the image."));
+        }
+    }
+}
+
+/**
+ * @brief Rotates the current image 90 degrees to the right.
+ */
+void MainWindow::rotateImageRight()
+{
+    currentImage = currentImage.transformed(QTransform().rotate(90));
+    originalImage = originalImage.transformed(QTransform().rotate(90));
+    updateImageDisplay();
+}
+
+/**
+ * @brief Rotates the current image 90 degrees to the left.
+ */
+void MainWindow::rotateImageLeft()
+{
+    currentImage = currentImage.transformed(QTransform().rotate(-90));
+    originalImage = originalImage.transformed(QTransform().rotate(-90));
+    updateImageDisplay();
+}
+
+/**
+ * @brief Flips the current image horizontally.
+ */
+void MainWindow::flipImage()
+{
+    currentImage = currentImage.mirrored(true, false);
+    originalImage = originalImage.mirrored(true, false);
+    updateImageDisplay();
+}
+
+/**
+ * @brief Initiates the cropping mode for the image.
+ */
+void MainWindow::cropImage()
+{
+    isCropMode = true;
+    cropRect = QRect();
+}
+
+
+
+
+//********************* Slots - Methods responding to signals ************************//
 
 /**
  * @brief Slot called when images are fetched from the image service.
@@ -597,6 +622,92 @@ void MainWindow::onHistogramCalculated(const QString& imageIdentifier, const QSt
 }
 
 /**
+ * @brief Slot called when a filter button is clicked.
+ * @param filterType The type of filter to apply.
+ */
+void MainWindow::onFilterButtonClicked(int filterType)
+{
+    if (currentImage.isNull()) {
+        QMessageBox::warning(this, "No Image", "Please load an image first.");
+        return;
+    }
+
+    if (currentFilter == filterType) {
+        currentImage = originalImage;
+        currentFilter = MainWindowController::NoFilter;
+        updateImageDisplay();
+    }
+    else {
+        currentFilter = static_cast<MainWindowController::FilterType>(filterType);
+        controller->applyFilter(originalImage, currentFilter);
+    }
+}
+
+/**
+ * @brief Slot called when a filtered image is ready to be displayed.
+ * @param filteredImage The filtered image.
+ * @param filterType The type of filter applied.
+ */
+void MainWindow::displayFilteredResult(const QImage& filteredImage, MainWindowController::FilterType filterType)
+{
+    if (currentFilter == filterType) {
+        currentImage = filteredImage;
+        updateImageDisplay();
+    }
+}
+
+
+
+
+//****************************** Helper Methods *******************************//
+
+/**
+ * @brief Adds an image to the image list widget.
+ * @param image The image metadata to add.
+ */
+void MainWindow::addImageToList(const Image& image)
+{
+    QIcon icon;
+
+    if (!image.imageData.isEmpty()) {
+        QImage img = QImage::fromData(image.imageData).scaled(50, 50, Qt::KeepAspectRatio);
+        icon = QIcon(QPixmap::fromImage(img));
+    }
+    else {
+        icon = QIcon(":/MainWindow/Icons/placeholder.png");
+    }
+
+    QListWidgetItem* item = new QListWidgetItem(icon, QString("%1 | %2 | %3x%4")
+        .arg(image.id).arg(image.name).arg(image.width).arg(image.height));
+    item->setData(Qt::UserRole, QVariant::fromValue(image));
+    imageList->addItem(item);
+}
+
+/**
+ * @brief Checks if an image is already in the image list.
+ * @param path The file path of the image.
+ * @return True if the image is in the list, false otherwise.
+ */
+bool MainWindow::isImageInList(const QString& path)
+{
+    return std::any_of(images.begin(), images.end(), [&path](const Image& img) {
+        return img.path == path;
+        });
+}
+
+/**
+ * @brief Scales the given image to fit the image viewer.
+ * @param image The image to scale.
+ * @return The scaled QPixmap.
+ */
+QPixmap MainWindow::scaleImageToViewer(const QImage& image)
+{
+    QSize viewerSize = imageViewer->size();
+    QPixmap pixmap = QPixmap::fromImage(image);
+    return pixmap.scaled(viewerSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+}
+
+/**
  * @brief Updates the image display area with the current image.
  */
 void MainWindow::updateImageDisplay()
@@ -736,148 +847,92 @@ void MainWindow::drawAxes(QPainter& painter)
 }
 
 /**
- * @brief Saves the current image to a file.
+ * @brief Draws custom columns and circles on the UI for aesthetic purposes.
+ * @param painter The QPainter object used for drawing.
  */
-void MainWindow::saveImage()
+void MainWindow::drawColumnsAndCircles(QPainter& painter)
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Image"), "", tr("PNG Image (*.png);;JPEG Image (*.jpg)"));
-    if (!fileName.isEmpty()) {
-        if (!currentImage.save(fileName)) {
-            QMessageBox::warning(this, tr("Save Error"), tr("Failed to save the image."));
-        }
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(QBrush(QColor("#f5f5dc")));
+
+    int leftColumnWidth = 55;
+    int leftColumnX = folderButton->x() - 8;
+    int leftColumnY = 45;
+    int leftColumnHeight = flipButton->geometry().bottom() - leftColumnY + 10;
+
+    painter.drawRoundedRect(leftColumnX, leftColumnY, leftColumnWidth, leftColumnHeight + 20, 0, 0);
+
+    int circleDiameter = leftColumnWidth;
+    int circleX = leftColumnX;
+    int circleY = leftColumnY + leftColumnHeight - 10;
+
+    painter.drawEllipse(circleX, circleY, circleDiameter, circleDiameter);
+
+    int rightColumnWidth = 63;
+    int rightColumnX = this->width() - rightColumnWidth - 10;
+    int rightColumnY = filter1Button->y();
+    int rightColumnHeight = this->height() - rightColumnY + 50;
+
+    painter.drawRoundedRect(rightColumnX, rightColumnY, rightColumnWidth, rightColumnHeight, 30, 35);
+}
+
+/**
+ * @brief Loads images from the image service asynchronously.
+ */
+void MainWindow::loadImages()
+{
+    controller->fetchImagesAsync();
+}
+
+/**
+ * @brief Displays the list of images in the image list widget.
+ * @param images The list of images to display.
+ */
+void MainWindow::displayImages(const QList<Image>& images)
+{
+    imageList->clear();
+    for (const Image& img : images) {
+        addImageToList(img);
     }
 }
 
 /**
- * @brief Rotates the current image 90 degrees to the right.
+ * @brief Loads the first image in the image list and displays it.
  */
-void MainWindow::rotateImageRight()
+void MainWindow::loadFirstImage()
 {
-    currentImage = currentImage.transformed(QTransform().rotate(90));
-    originalImage = originalImage.transformed(QTransform().rotate(90));
-    updateImageDisplay();
-}
-
-/**
- * @brief Rotates the current image 90 degrees to the left.
- */
-void MainWindow::rotateImageLeft()
-{
-    currentImage = currentImage.transformed(QTransform().rotate(-90));
-    originalImage = originalImage.transformed(QTransform().rotate(-90));
-    updateImageDisplay();
-}
-
-/**
- * @brief Flips the current image horizontally.
- */
-void MainWindow::flipImage()
-{
-    currentImage = currentImage.mirrored(true, false);
-    originalImage = originalImage.mirrored(true, false);
-    updateImageDisplay();
-}
-
-/**
- * @brief Handles the mouse press event for cropping functionality.
- * @param event The mouse event.
- */
-void MainWindow::mousePressEvent(QMouseEvent* event)
-{
-    if (event->button() == Qt::LeftButton && isCropMode) {
-        QPoint imageViewerPos = imageViewer->mapFrom(this, event->pos());
-        if (imageViewer->rect().contains(imageViewerPos)) {
-            isCropping = true;
-            cropStartPoint = imageViewerPos;
-            cropRect = QRect(cropStartPoint, cropStartPoint);
-        }
+    if (!images.isEmpty()) {
+        QListWidgetItem* firstItem = imageList->item(0);
+        onImageSelected(firstItem);
     }
 }
 
-/**
- * @brief Handles the mouse move event for cropping functionality.
- * @param event The mouse event.
- */
-void MainWindow::mouseMoveEvent(QMouseEvent* event)
-{
-    if (isCropping && isCropMode) {
-        QPoint imageViewerPos = imageViewer->mapFrom(this, event->pos());
-        cropRect = QRect(cropStartPoint, imageViewerPos).normalized();
-        updateImageDisplay();
-    }
-}
 
-/**
- * @brief Handles the mouse release event for cropping functionality.
- * @param event The mouse event.
- */
-void MainWindow::mouseReleaseEvent(QMouseEvent* event)
-{
-    if (event->button() == Qt::LeftButton && isCropping && isCropMode) {
-        isCropping = false;
 
-        QRect adjustedRect = cropRect.translated(-imageOffsetX, -imageOffsetY);
 
-        float scaleX = static_cast<float>(currentImage.width()) / scaledImageSize.width();
-        float scaleY = static_cast<float>(currentImage.height()) / scaledImageSize.height();
 
-        QRect imageCropRect = QRect(
-            adjustedRect.left() * scaleX,
-            adjustedRect.top() * scaleY,
-            adjustedRect.width() * scaleX,
-            adjustedRect.height() * scaleY
-        ).normalized();
 
-        if (!imageCropRect.isEmpty() && currentImage.rect().contains(imageCropRect)) {
-            currentImage = currentImage.copy(imageCropRect);
-            originalImage = originalImage.copy(imageCropRect);
-            updateImageDisplay();
-        }
-        cropRect = QRect();
-        isCropMode = false;
-    }
-}
 
-/**
- * @brief Initiates the cropping mode for the image.
- */
-void MainWindow::cropImage()
-{
-    isCropMode = true;
-    cropRect = QRect();
-}
 
-/**
- * @brief Slot called when a filter button is clicked.
- * @param filterType The type of filter to apply.
- */
-void MainWindow::onFilterButtonClicked(int filterType)
-{
-    if (currentImage.isNull()) {
-        QMessageBox::warning(this, "No Image", "Please load an image first.");
-        return;
-    }
 
-    if (currentFilter == filterType) {
-        currentImage = originalImage;
-        currentFilter = MainWindowController::NoFilter;
-        updateImageDisplay();
-    }
-    else {
-        currentFilter = static_cast<MainWindowController::FilterType>(filterType);
-        controller->applyFilter(originalImage, currentFilter);
-    }
-}
 
-/**
- * @brief Slot called when a filtered image is ready to be displayed.
- * @param filteredImage The filtered image.
- * @param filterType The type of filter applied.
- */
-void MainWindow::displayFilteredResult(const QImage& filteredImage, MainWindowController::FilterType filterType)
-{
-    if (currentFilter == filterType) {
-        currentImage = filteredImage;
-        updateImageDisplay();
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

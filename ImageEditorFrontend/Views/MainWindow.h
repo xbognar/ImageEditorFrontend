@@ -64,25 +64,24 @@ private:
     QPushButton* blueRGBButton;
     QPushButton* greenRGBButton;
 
+    bool isCropping;
+    bool isCropMode;
+    bool firstResizeEvent;
+    int imageOffsetX;
+    int imageOffsetY;
     QList<Image> images;
     QMap<QString, QImage> loadedImages;
     QImage currentImage;
     QString currentImagePath;
-    bool firstResizeEvent;
     QMap<QString, bool> channelVisibility;
-
     QMap<QString, QMap<QString, QVector<int>>> histogramCache;
-
     QRect cropRect;
     QPoint cropStartPoint;
-    bool isCropping;
-    bool isCropMode;
-    int imageOffsetX;
-    int imageOffsetY;
     QSize scaledImageSize;
     QImage originalImage;
     MainWindowController::FilterType currentFilter;
     QMap<QPushButton*, MainWindowController::FilterType> filterButtons;
+    QPixmap scaleImageToViewer(const QImage& image);
 
     void applyStylesheet();
     void setupHistogram();
@@ -97,7 +96,7 @@ private:
     void updateHistogramDisplay();
     void drawHistogram(QPainter& painter, const QVector<int>& histogram, QColor color);
     void drawAxes(QPainter& painter);
-    QPixmap scaleImageToViewer(const QImage& image);
+    
 
 private slots:
 
